@@ -1,5 +1,10 @@
 # glinits-restful
 
+## Todo list
+1. setup Ngnix and WSGI server in front of the Flask server
+1. setup Psql db and connect with sqlalchemy from the python app
+1. create RESTful APIs that CRUD against db
+
 ## RESTful API with Postgresql support
 
 * while preparing the interview for Glints, I decided to refresh basic web skills with the most up-to-date technology. 
@@ -36,5 +41,25 @@
 ### install dependencies
 1. `poetry add flask`
     
+
+### Issues
+1. The poetry installed from the `python:3.9.6-slim` image failed to support complete poetry installation. Shows error like below:
+    ```sh
+    => ERROR [builder-base 5/5] RUN poetry install --no-dev                                                                                0.4s
+    ------                                                                                                                                       
+    > [builder-base 5/5] RUN poetry install --no-dev:                                                                                           
+    #10 0.370 Traceback (most recent call last):                                                                                                 
+    #10 0.370   File "/opt/poetry/bin/poetry", line 17, in <module>
+    #10 0.370     from poetry.console import main
+    #10 0.370   File "/opt/poetry/lib/poetry/console/__init__.py", line 1, in <module>
+    #10 0.370     from .application import Application
+    #10 0.370   File "/opt/poetry/lib/poetry/console/application.py", line 1, in <module>
+    #10 0.370     from cleo import Application as BaseApplication
+    #10 0.370 ModuleNotFoundError: No module named 'cleo'
+    ```
+    * so I downgraded the image to `python:3.8-slim` and modified `pyproject.toml` to `python = "^3.8"`. 
+    * [WARNING] This could cause trouble while I was developing with python3.9 by run with python3.8. 
+### Reference
+1. [Dockerfile example](https://www.mktr.ai/the-data-scientists-quick-guide-to-dockerfiles-with-examples/)
 
 

@@ -1,0 +1,36 @@
+version: '3.8'
+services:
+    # nginx:
+    #     container_name: glinits_nginx
+    #     image: nginx:1.21
+    #     ports:
+    #         - "80:80"
+    #     volumes:
+    #         - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    #         - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    #     networks:
+    #         - network
+    #     restart: always
+    # psql:
+    #     container_name: glinits_psql
+    #     image: postgres:13
+    #     volumes:
+    #         - pgdata:/var/lib/postgresql/data
+    #     ports:
+    #         - "5432:5432"
+    #     networks:
+    #         - network
+    #     restart: always
+    web:
+        container_name: glinits_app
+        build:
+            context: .
+            dockerfile: Dockerfile
+        image: glinits_app
+        # command: uwsgi --ini uwsgi.ini
+        command: flask run --host 0.0.0.0
+        # the random IP used in CONTAINER always maps to localhost in HOST
+        # use `docker ps` to check for the actual binding
+        ports:
+            - "5000:5000"
+        restart: always
