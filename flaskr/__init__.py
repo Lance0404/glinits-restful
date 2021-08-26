@@ -2,7 +2,7 @@ import os
 
 from flask import Flask
 
-from flaskr.default_settings import *
+from .default_settings import *
 
 def create_app(test_config=None):
     # create and configure the app

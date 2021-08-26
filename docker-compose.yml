@@ -11,26 +11,31 @@ services:
     #     networks:
     #         - network
     #     restart: always
-    # psql:
-    #     container_name: glinits_psql
-    #     image: postgres:13
-    #     volumes:
-    #         - pgdata:/var/lib/postgresql/data
-    #     ports:
-    #         - "5432:5432"
-    #     networks:
-    #         - network
-    #     restart: always
-    web:
-        container_name: glinits_app
-        build:
-            context: .
-            dockerfile: Dockerfile
-        image: glinits_app
-        # command: uwsgi --ini uwsgi.ini
-        command: flask run --host 0.0.0.0
-        # the random IP used in CONTAINER always maps to localhost in HOST
-        # use `docker ps` to check for the actual binding
+    psql:
+        container_name: glinits_psql
+        image: postgres:13
+        environment:
+        - POSTGRES_USER=lance
+        - POSTGRES_PASSWORD=lance123
+        - POSTGRES_DATABASE=glinits
+        - POSTGRES_PORT=5432        
+        volumes:
+            - glinits_psql_data:/var/lib/postgresql/data
         ports:
-            - "5000:5000"
+            - "5432:5432"
         restart: always
+    # web:
+    #     container_name: glinits_app
+    #     build:
+    #         context: .
+    #         dockerfile: Dockerfile
+    #     image: glinits_app
+    #     # command: uwsgi --ini uwsgi.ini
+    #     command: flask run --host 0.0.0.0
+    #     # the random IP used in CONTAINER always maps to localhost in HOST
+    #     # use `docker ps` to check for the actual binding
+    #     ports:
+    #         - "5000:5000"
+    #     restart: always
+volumes:
+    glinits_psql_data:
