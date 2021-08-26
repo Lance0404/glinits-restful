@@ -42,6 +42,14 @@
 1. `poetry add flask`
     
 
+### start the Flask app
+1. while at local dev env
+```sh
+# requried env vars were set in .env and .flaskenv
+flask run
+```
+
+
 ### Issues
 1. The poetry installed from the `python:3.9.6-slim` image failed to support complete poetry installation. Shows error like below:
     ```sh
@@ -62,4 +70,5 @@
 ### Reference
 1. [Dockerfile example](https://www.mktr.ai/the-data-scientists-quick-guide-to-dockerfiles-with-examples/)
 1. [Flask custom commands](https://flask.palletsprojects.com/en/2.0.x/cli/#custom-commands)
+1. [Environment variables from dotenv](https://flask.palletsprojects.com/en/2.0.x/cli/#environment-variables-from-dotenv)
 
