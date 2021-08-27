@@ -25,6 +25,11 @@ def create_app():
         db.init_app(app)
         db.create_all()
         db.session.commit()
+
+        from .api.v1.hello import bp as hello_bp
+        
+        app.register_blueprint(hello_bp, url_prefix='/v1')
+        # above will overwrite the `url_prefix` defined in the Blueprint() constructor
     return app
 
 app = create_app()

@@ -7,7 +7,8 @@
 
 ## RESTful API with Postgresql support
 
-* while preparing the interview for Glints, I decided to refresh basic web skills with the most up-to-date technology. 
+* While preparing the interview for Glints, I decided to refresh basic web skills with the most up-to-date technology. 
+* So I kept as many comments in my code as possible
 
 * ingredients:
 1. Python3.9
