@@ -116,6 +116,10 @@ docker-compose up -d
 1. [Environment variables from dotenv](https://flask.palletsprojects.com/en/2.0.x/cli/#environment-variables-from-dotenv)
 1. [create database if not exists with sqlalchemy](https://stackoverflow.com/a/30971098)
 1. [Using foreign key ON DELETE cascade with ORM relationships](https://docs.sqlalchemy.org/en/14/orm/cascades.html#using-foreign-key-on-delete-cascade-with-orm-relationships)
+1. [__str__ vs __repr__ in TW version](https://ithelp.ithome.com.tw/articles/10194593)
+1. [list comprehension & generator expression](https://www.learncodewithmike.com/2020/01/python-comprehension.html)
+1. [how to implement generator & `yield from` in TW version](https://ithelp.ithome.com.tw/articles/10196328)
+1. [static, class, instance method](https://www.learncodewithmike.com/2020/01/python-method.html)
 
 ### Issues with solutions
 1. [sqlalchemy create all does not create tables](https://stackoverflow.com/a/20749534)

@@ -22,8 +22,12 @@ class Restaurant(db.Model):
     name = Column(String(100), nullable=False, index=True, unique=True)
     cash_balance = Column(Float, nullable=False)
 
+    def __init__(self, name, cash_balance):
+        self.name = name
+        self.cash_balance = cash_balance
+
     def __repr__(self):
-        return f'{self.name}'
+        return f'<Restaurant {self.id} {self.name} {self.cash_balance}>'
 
 class RestaurantOpening(db.Model):
     __tablename__ = 'restaurant_opening'

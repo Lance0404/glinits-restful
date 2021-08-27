@@ -9,3 +9,6 @@ class Common(Exception):
     def __init__(self, message="error of common type"):
         self.message = message
         super().__init__(self.message)
+
+    def __str__(self):
+        return f'customized message for print here: {self.message}'

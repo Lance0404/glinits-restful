@@ -4,7 +4,7 @@ from sqlalchemy_utils import database_exists, create_database
 
 from buying_frenzy import db
 from buying_frenzy.default_settings import Config
-from buying_frenzy.models import *
+from buying_frenzy.model import *
 # https://stackoverflow.com/a/20749534
 # models should be imported and run before any db related operation 
 # e.g. create_all(), drop_all()
@@ -33,12 +33,3 @@ def create_app():
     return app
 
 app = create_app()
-
-# put utilies here to keep app.py concise
-def drop_all_tables():
-    db.drop_all()
-    db.session.commit()
-
-def elt_from_json_to_db():
-    app.logger.info('todo')
-

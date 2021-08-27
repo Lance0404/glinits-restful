@@ -1,3 +1,4 @@
+# TODO: this file is having duplicated functionality as `buying_frenzy/api/__init__.py`
 from flask import jsonify
 
 from .hello import bp
