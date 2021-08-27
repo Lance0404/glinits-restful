@@ -5,6 +5,10 @@
 1. setup Psql db and connect with sqlalchemy from the python app
 1. create RESTful APIs that CRUD against db
 
+
+## Wish list
+1. come up with a FAST API solution
+
 ## RESTful API with Postgresql support
 
 * While preparing the interview for Glints, I decided to refresh basic web skills with the most up-to-date technology. 
@@ -120,7 +124,9 @@ docker-compose up -d
 1. [list comprehension & generator expression](https://www.learncodewithmike.com/2020/01/python-comprehension.html)
 1. [how to implement generator & `yield from` in TW version](https://ithelp.ithome.com.tw/articles/10196328)
 1. [static, class, instance method](https://www.learncodewithmike.com/2020/01/python-method.html)
+1. [basic relationship pattern](https://docs.sqlalchemy.org/en/14/orm/basic_relationships.html)
 
 ### Issues with solutions
 1. [sqlalchemy create all does not create tables](https://stackoverflow.com/a/20749534)
     * In short, put model code before create_all() 
+1. [sqlalchemy tables with relationship & Alembic example](https://blog.techbridge.cc/2017/08/12/python-web-flask101-tutorial-sqlalchemy-orm-database-models/)    

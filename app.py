@@ -29,15 +29,13 @@ def etl(path):
     or 
     `flask etl data/users_with_purchase_history.json`
     """
-    app.logger.info('do ETL')
-
+    app.logger.info('start ETL')
     data_generator = json_to_generator(path)
     if 'restaurant_with_menu' in path:
-        app.logger.info('start processing restaurant data')
         process_restaurant_data(data_generator)
     elif 'users_with_purchase_history' in path:
-        app.logger.info('start processing user data')
         process_user_data(data_generator)
-    
+    app.logger.info('end ETL')
+
 if __name__ == '__main__':
     app.run()
