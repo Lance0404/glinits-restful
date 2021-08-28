@@ -1,7 +1,7 @@
 from typing import Generator
 from buying_frenzy import db
-from .entity import RestaurantEntity
-from .service import RestaurantService
+from .entity import CustomerEntity, RestaurantEntity
+from .service import RestaurantService, CustomerService
 from .factory import app
 
 # put utilies here to keep app.py concise
@@ -10,8 +10,7 @@ def drop_all_tables():
     db.session.commit()
 
 def process_restaurant_data(data: Generator):
-    """
-    import data to database
+    """Import data to database
     """
     app.logger.info('start processing restaurant data')
     while True:
@@ -21,14 +20,22 @@ def process_restaurant_data(data: Generator):
             break
         else:
             RestaurantService.create(RestaurantEntity(item))
-            # do one for quick parse test
+            # FIXME: do one for quick parse test, remember to remove the break
             break
     app.logger.info('finished processing restaurant data')        
 
 
 def process_user_data(data: Generator):
-    """
-    import user data to database
+    """Import user data to database
     """
     app.logger.info('start processing user data')
-    pass
+    while True:
+        try:
+            item = next(data)
+        except StopIteration:
+            break
+        else:
+            CustomerService.create(CustomerEntity(item))
+            # FIXME: do one for quick parse test, remember to remove the break
+            break
+    app.logger.info('finished processing user data')  

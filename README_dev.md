@@ -5,7 +5,6 @@
 1. setup Psql db and connect with sqlalchemy from the python app
 1. create RESTful APIs that CRUD against db
 
-
 ## Wish list
 1. come up with a FAST API solution
 
@@ -125,6 +124,7 @@ docker-compose up -d
 1. [how to implement generator & `yield from` in TW version](https://ithelp.ithome.com.tw/articles/10196328)
 1. [static, class, instance method](https://www.learncodewithmike.com/2020/01/python-method.html)
 1. [basic relationship pattern](https://docs.sqlalchemy.org/en/14/orm/basic_relationships.html)
+1. [breakpoint()](https://www.journaldev.com/22695/python-breakpoint)
 
 ### Issues with solutions
 1. [sqlalchemy create all does not create tables](https://stackoverflow.com/a/20749534)

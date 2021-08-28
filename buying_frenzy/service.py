@@ -3,7 +3,7 @@ contains functions that directly interacts with database
 """
 
 from sqlalchemy.sql import expression
-from .entity import RestaurantEntity
+from .entity import RestaurantEntity, CustomerEntity
 from .model import (
     Restaurant, RestaurantOpening, RestaurantMenu,
     Customer, CustomerHistory,
@@ -30,8 +30,8 @@ class RestaurantService():
 
     @classmethod
     def create(cls, data: RestaurantEntity):
-        re = Restaurant(data.name, data.cash_balance)
-        db.session.add(re)
+        resta = Restaurant(data.name, data.cash_balance)
+        db.session.add(resta)
         commit()
 
         db.session.flush()
@@ -41,9 +41,9 @@ class RestaurantService():
 
         # TODO: using list comprehension, cause I failed with generator comprehension
         logger.debug(f'preparing to insert {RestaurantMenu.__tablename__}')
-        [db.session.add(RestaurantMenu(re.id, i.name, i.price)) for i in data.menu]
+        [db.session.add(RestaurantMenu(resta.id, i.name, i.price)) for i in data.menu]
         logger.debug(f'preparing to insert {RestaurantOpening.__tablename__}')
-        [db.session.add(RestaurantOpening(re.id, opening.day_of_week, opening.start, opening.end)) for opening in data.opening_hours]
+        [db.session.add(RestaurantOpening(resta.id, opening.day_of_week, opening.start, opening.end)) for opening in data.opening_hours]
         commit()
 
 class CustomerService():
@@ -52,5 +52,9 @@ class CustomerService():
         pass
 
     @classmethod
-    def create(cls, data: RestaurantEntity):
-        pass
+    def create(cls, customer_entity: CustomerEntity):
+        customer = Customer(customer_entity.id, customer_entity.name, customer_entity.cash_balance)
+        db.session.add(customer)
+        [db.session.add(CustomerHistory(customer_entity.id, i.dish_name, i.restaurant_name, i.trans_amount, i.trans_date)) for i in customer_entity.purchase_history]
+        commit()
+

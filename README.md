@@ -14,6 +14,10 @@ flask run
 ```sh
 flask etl data/restaurant_with_menu.json
 ```
+* ETL: import user data to database
+```sh
+flask etl data/users_with_purchase_history.json
+```
 
 ### Todo list (kept updating)
 * ETL

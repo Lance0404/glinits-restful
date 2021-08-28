@@ -63,16 +63,31 @@ class RestaurantMenu(db.Model):
 
 class Customer(db.Model):
     __tablename__ = 'customer'
+	# the `id` came from json
     id = Column(Integer, primary_key=True, autoincrement=False)
-    # `id` came from json
     name = Column(String(100), nullable=False, index=True, unique=True)
     cash_balance = Column(Float, nullable=False)
+    customer_history = relationship(
+        "CustomerHistory", back_populates="customer", foreign_keys='CustomerHistory.customer_id', cascade="all, delete-orphan", passive_deletes=True, lazy='dynamic')
+
+    def __init__(self, id, name, cash_balance):
+        self.id = id
+        self.name = name
+        self.cash_balance = cash_balance
 
 class CustomerHistory(db.Model):
     __tablename__ = 'customer_history'
     id = Column(Integer, primary_key=True)
     customer_id = Column(Integer, ForeignKey('customer.id', ondelete='CASCADE'), index=True)
+    customer = relationship('Customer', foreign_keys=customer_id, single_parent=True)
     dish_name = Column(String(200), nullable=False, index=True)
     restaurant_name = Column(String(100), nullable=False, index=True, unique=True)
-    transaction_amount = Column(Float, nullable=False)
-    transaction_date = Column(DateTime(timezone=False), nullable=False)
+    trans_amount = Column(Float, nullable=False)
+    trans_date = Column(DateTime(timezone=False), nullable=False)
+
+    def __init__(self, customer_id, dish_name, restaurant_name, trans_amount, trans_date):
+        self.customer_id = customer_id
+        self.dish_name = dish_name
+        self.restaurant_name = restaurant_name
+        self.trans_amount = trans_amount
+        self.trans_date = trans_date

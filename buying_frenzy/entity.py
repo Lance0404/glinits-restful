@@ -35,10 +35,10 @@ class RestaurantEntity():
             j = (j for j in re.split(r'(?<=\w)\s+(?=\d)', i, maxsplit=2))
             day_of_week_str = next(j)
             time_range = next(j)
+            days = self.__day_of_week(day_of_week_str)
             # print(f'day_of_week_str: {day_of_week_str}')
             # print(f'time_range: {time_range}')
-            days = self.__day_of_week(day_of_week_str)
-            # print(f'days {days}')
+            # print(f'days: {days}')
             self.opening_hours += [Opening(k, time_range) for k in days]
 
     def __day_of_week(self, item: str) -> tuple:
@@ -151,8 +151,61 @@ class Opening():
         return json.dumps(self.__repr__())
 
     def __repr__(self) -> str:
-        return json.dumps(dict(
+        return dict(
             day_of_week = self.day_of_week,
             start = self.start.__repr__(),
             end = self.end.__repr__()
-        ))
+        )
+
+class CustomerEntity():
+    id: int = None
+    name: str = None
+    cash_balance: float = None
+    purchase_history: tuple = None
+
+    def __init__(self, item: dict) -> None:
+        self.id = item['id']
+        self.name = item['name']
+        self.cash_balance = item['cashBalance']
+        self.__purchase_history(item['purchaseHistory'])
+        
+    def __purchase_history(self, actions: list):
+        self.purchase_history = tuple(PurchaseHistory(i) for i in actions)
+
+    def __str__(self) -> str:
+        return json.dumps(self.__repr__())
+
+    def __repr__(self) -> str:
+        return dict(
+            id = self.id,
+            name = self.name,
+            cash_balance = self.cash_balance,
+            purchase_history = [i.__repr__() for i in self.purchase_history]
+        )
+
+
+class PurchaseHistory():
+    dish_name: str = None
+    restaurant_name: str = None
+    trans_amount: float = None
+    trans_date: datetime = None
+
+    def __init__(self, item: dict) -> None:
+        self.dish_name = item['dishName']
+        self.restaurant_name = item['restaurantName']
+        self.trans_amount = item['transactionAmount']
+        self.__trans_date(item['transactionDate'])
+
+    def __trans_date(self, trans_data: str):
+        self.trans_date = parse(trans_data)
+
+    def __str__(self) -> str:
+        return json.dumps(self.__repr__())
+    
+    def __repr__(self) -> str:
+        return dict(
+            dish_name=self.dish_name,
+            restaurant_name = self.restaurant_name,
+            trans_amount = self.trans_amount,
+            trans_date = self.trans_date.__repr__()
+        )
