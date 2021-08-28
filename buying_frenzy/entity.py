@@ -1,13 +1,10 @@
-# transformers that do the ugly work
+from flask import current_app
 from datetime import datetime, time
 from dateutil.parser import parse
 import json
 import re
 
-
-from .factory import app
-
-logger = app.logger
+logger = current_app.logger
 
 class RestaurantEntity():
     name = None
@@ -20,15 +17,13 @@ class RestaurantEntity():
         self.name = item['restaurantName']
         self.cash_balance = item['cashBalance']
         self.menu = self.__menu(item['menu'])
-        # self.opening_hours = self.__opening_hours(item['openingHours'])
         self.__opening_hours(item['openingHours'])
-        print(f'self.opening_hours {self.opening_hours}')
-        # raise Exception('Lance Checkpoint!')
+        print(self)
 
     def __menu(self, items: list) -> tuple:
         return (Dish(i['dishName'], i['price']) for i in items)
 
-    def __opening_hours(self, item: str) -> list:
+    def __opening_hours(self, item: str):
         """Returns a tuple of `Opening` instances
         """
         for i in (i.strip() for i in item.split(' / ')):
@@ -99,7 +94,7 @@ class RestaurantEntity():
             name = self.name,
             cash_balance = self.cash_balance,
             menu = [i.__repr__() for i in self.menu],
-            opening_hours = self.opening_hours,
+            opening_hours = [i.__repr__() for i in self.opening_hours],
         )
 
 class Dish():

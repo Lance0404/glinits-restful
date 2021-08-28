@@ -1,17 +1,15 @@
-"""
-contains functions that directly interacts with database
-"""
+from flask import current_app
+from datetime import datetime, time
+from sqlalchemy import select
 
-from sqlalchemy.sql import expression
 from .entity import RestaurantEntity, CustomerEntity
 from .model import (
     Restaurant, RestaurantOpening, RestaurantMenu,
     Customer, CustomerHistory,
 )
-from .factory import app
 from . import db
 
-logger = app.logger
+logger = current_app.logger
 
 def commit():
     """
@@ -45,6 +43,18 @@ class RestaurantService():
         logger.debug(f'preparing to insert {RestaurantOpening.__tablename__}')
         [db.session.add(RestaurantOpening(resta.id, opening.day_of_week, opening.start, opening.end)) for opening in data.opening_hours]
         commit()
+
+    @classmethod
+    def list_restaurant_by(cls, t: time):
+        # FIXME: should intake datetime which carries day of week information
+        logger.debug(f'start list_restaurant_by({time})')
+        stmt = (select(RestaurantOpening)
+            .where(RestaurantOpening.start < t)
+            .where(RestaurantOpening.end > t))
+        logger.debug(f'stmt: {stmt}')
+        result = db.session.execute(stmt)
+        resta_openings = result.fetchall()
+        breakpoint()
 
 class CustomerService():
 

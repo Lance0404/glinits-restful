@@ -48,6 +48,9 @@ class RestaurantOpening(db.Model):
         self.start = start
         self.end = end
 
+    def __repr__(self):
+        return f'<RestaurantOpening {self.id} {self.restaurant_id} {self.day_of_week} {self.start} {self.end}>'
+
 class RestaurantMenu(db.Model):
     __tablename__ = 'restaurant_menu'
     id = Column(Integer, primary_key=True)
@@ -62,6 +65,8 @@ class RestaurantMenu(db.Model):
         self.price = price
 
 class Customer(db.Model):
+    """Currently don't have relationship with Restaurant-tables
+    """
     __tablename__ = 'customer'
 	# the `id` came from json
     id = Column(Integer, primary_key=True, autoincrement=False)

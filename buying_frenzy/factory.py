@@ -27,9 +27,11 @@ def create_app():
         db.session.commit()
 
         from .api.v1.hello import bp as hello_bp
-        
         app.register_blueprint(hello_bp, url_prefix='/v1')
         # above will overwrite the `url_prefix` defined in the Blueprint() constructor
+        from .api.v1.restaurant import bp as restaurant_bp
+        app.register_blueprint(restaurant_bp, url_prefix='/v1/restaurant')
+
     return app
 
 app = create_app()
