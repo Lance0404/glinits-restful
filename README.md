@@ -20,7 +20,7 @@ flask etl data/users_with_purchase_history.json
 ```
 
 ### Todo list (kept updating)
-* ETL
+* ETL, process restaurant data and user data before loading into the database
 
 ### Notes
 * [READM_dev.md]((README_dev.md)) is my personal notes while developing
