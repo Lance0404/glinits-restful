@@ -24,6 +24,28 @@ def json_to_generator(path: str) -> Generator:
     """
     return (i for i in json.load(open(path)))
 
+
+@app.cli.command("pre-etl")
+def pre_etl():
+    """Preprocess raw data before loading them into database
+
+    checked which has more items:
+    cat data/restaurant_with_menu.json| grep -c 'openingHours'
+    2203
+
+    cat data/users_with_purchase_history.json | grep -c 'purchaseHistory'
+    1000
+
+    Restaurant items is more than User data, but we still need to use loop through restaurant data
+    """
+
+    resta_generator = json_to_generator('data/restaurant_with_menu.json')
+    user_generator = json_to_generator('data/users_with_purchase_history.json')
+    (new_resta_generator, new_user_generator) = integrate_restaurant_and_user_data(resta_generator, user_generator)
+    # process_restaurant_data(new_resta_generator)
+    process_user_data(new_user_generator)
+
+# FIXME: currently not used
 @app.cli.command("etl")
 @click.argument("path")
 @deprecated
@@ -42,25 +64,6 @@ def etl(path):
     elif 'users_with_purchase_history' in path:
         process_user_data(data_generator)
     app.logger.info('end ETL')
-
-@app.cli.command("pre-etl")
-def pre_etl():
-    """Preprocess raw data before loading them into database
-
-    checked which has more items:
-    cat data/restaurant_with_menu.json| grep -c 'openingHours'
-    2203
-
-    cat data/users_with_purchase_history.json | grep -c 'purchaseHistory'
-    1000
-
-    Restaurant items is more than User data, but we still need to use loop through restaurant data
-    """
-
-    resta_generator = json_to_generator('data/restaurant_with_menu.json')
-    user_generator = json_to_generator('data/users_with_purchase_history.json')
-    integrate_restaurant_and_user_data(resta_generator, user_generator)
-
 
 if __name__ == '__main__':
     app.run()

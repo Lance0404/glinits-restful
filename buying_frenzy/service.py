@@ -38,9 +38,9 @@ class RestaurantService():
         # `flush()` is necessary for returning the id created on the database to the `Restaurant` instance
 
         # TODO: using list comprehension, cause I failed with generator comprehension
-        logger.debug(f'preparing to insert {RestaurantMenu.__tablename__}')
+        # logger.debug(f'preparing to insert {RestaurantMenu.__tablename__}')
         [db.session.add(RestaurantMenu(resta.id, i.name, i.price)) for i in data.menu]
-        logger.debug(f'preparing to insert {RestaurantOpening.__tablename__}')
+        # logger.debug(f'preparing to insert {RestaurantOpening.__tablename__}')
         [db.session.add(RestaurantOpening(resta.id, opening.day_of_week, opening.start, opening.end)) for opening in data.opening_hours]
         commit()
 
@@ -65,6 +65,8 @@ class CustomerService():
     def create(cls, customer_entity: CustomerEntity):
         customer = Customer(customer_entity.id, customer_entity.name, customer_entity.cash_balance)
         db.session.add(customer)
-        [db.session.add(CustomerHistory(customer_entity.id, i.dish_name, i.restaurant_name, i.trans_amount, i.trans_date)) for i in customer_entity.purchase_history]
+        # FIXME: legacy code
+        if customer_entity.purchase_history:
+            [db.session.add(CustomerHistory(customer_entity.id, i.dish_name, i.restaurant_name, i.trans_amount, i.trans_date)) for i in customer_entity.purchase_history]
         commit()
 

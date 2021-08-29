@@ -56,7 +56,7 @@ class RestaurantMenu(db.Model):
     id = Column(Integer, primary_key=True)
     restaurant_id = Column(Integer, ForeignKey('restaurant.id', ondelete='CASCADE'), index=True)
     restaurant = relationship('Restaurant', foreign_keys=restaurant_id, single_parent=True)
-    dish_name = Column(String(200), nullable=False, index=True)
+    dish_name = Column(String(500), nullable=False, index=True)
     price = Column(Float, nullable=False)
 
     def __init__(self, restaurant_id, dish_name, price):
@@ -70,7 +70,7 @@ class Customer(db.Model):
     __tablename__ = 'customer'
 	# the `id` came from json
     id = Column(Integer, primary_key=True, autoincrement=False)
-    name = Column(String(100), nullable=False, index=True, unique=True)
+    name = Column(String(100), nullable=False, index=True)
     cash_balance = Column(Float, nullable=False)
     customer_history = relationship(
         "CustomerHistory", back_populates="customer", foreign_keys='CustomerHistory.customer_id', cascade="all, delete-orphan", passive_deletes=True, lazy='dynamic')

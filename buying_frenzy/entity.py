@@ -1,3 +1,4 @@
+from typing import Generator
 from flask import current_app
 from datetime import datetime, time
 from dateutil.parser import parse
@@ -9,23 +10,28 @@ logger = current_app.logger
 class RestaurantEntity():
     name = None
     cash_balance = float()
-    menu = None
-    # `menu` contains a tuple of `Dish` instance
+    menu: list = list()
     opening_hours: list = list()
 
     def __init__(self, item: dict) -> None:
         self.name = item['restaurantName']
         self.cash_balance = item['cashBalance']
-        self.menu = self.__menu(item['menu'])
+        self.__menu(item['menu'])
         self.__opening_hours(item['openingHours'])
-        print(self)
+        # print(f'RestaurantEntity: {self}')
+        # print(f'opening_hours {len(self.opening_hours)}')
+        # FIXME: the opening_hours kept accumulating
+        # breakpoint()
 
-    def __menu(self, items: list) -> tuple:
-        return (Dish(i['dishName'], i['price']) for i in items)
+    def __menu(self, items: list):
+        self.menu = [Dish(i['dishName'], i['price']) for i in items]
 
     def __opening_hours(self, item: str):
-        """Returns a tuple of `Opening` instances
-        """
+        # # FIXME: Lance hardcode test
+        # item = 'Mon - Weds 12:45 pm - 8:30 pm / Thurs 12:45 pm - 2:45 am / Fri - Sat 5:15 am - 6:30 pm / Sun 2:30 pm - 5:30 pm'
+        
+        # initialize with empty list
+        self.opening_hours = list()
         for i in (i.strip() for i in item.split(' / ')):
             j = (j for j in re.split(r'(?<=\w)\s+(?=\d)', i, maxsplit=2))
             day_of_week_str = next(j)
@@ -61,11 +67,6 @@ class RestaurantEntity():
 
             logger.error(f'item {item} no match to days!')
             raise Exception('no match to days!')                    
-
-        # TODO: to be removed
-        # # FIXME: hard code to be removed
-        # logger.debug('HARD CODE HERE!')
-        # item = 'Tue - Sun'
 
         with_comma = ',' in item
         with_hyphen = '-' in item
@@ -124,7 +125,7 @@ class Opening():
     end: time = None
 
     def __init__(self, day_of_week: int, time_range: str) -> None:
-        logger.debug(f'{day_of_week} => {time_range}')
+        # logger.debug(f'{day_of_week} => {time_range}')
         self.day_of_week = day_of_week
         self.__str_to_time(time_range)
 
@@ -162,7 +163,9 @@ class CustomerEntity():
         self.id = item['id']
         self.name = item['name']
         self.cash_balance = item['cashBalance']
-        self.__purchase_history(item['purchaseHistory'])
+        # FIXME: for legacy
+        if item.get('purchaseHistory', None):
+            self.__purchase_history(item['purchaseHistory'])
         
     def __purchase_history(self, actions: list):
         self.purchase_history = tuple(PurchaseHistory(i) for i in actions)
