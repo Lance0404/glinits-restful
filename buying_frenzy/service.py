@@ -1,7 +1,7 @@
 from flask import current_app
 from datetime import datetime, time
 from sqlalchemy import select
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, load_only
 
 from .entity import RestaurantEntity, CustomerEntity
 from .model import (
@@ -50,37 +50,70 @@ class RestaurantService():
         # FIXME: should intake datetime which carries day of week information
         logger.debug(f'start list_available_restaurant_by({dt})')
         logger.debug(f'weekday {dt.weekday()}, time {dt.time()}')
-        # FIXME: method 1:
+
+        # method 1: [ref](https://stackoverflow.com/a/39553869)
+        stmt = (db.session.query(Restaurant.name)
+            .select_from(RestaurantOpening)
+            .join(RestaurantOpening.restaurant)
+            .filter(RestaurantOpening.weekday == dt.weekday())
+            .filter(RestaurantOpening.start < dt.time())
+            .filter(RestaurantOpening.end > dt.time())            
+        )
+        logger.debug(stmt)
+        """
+        SELECT restaurant.name AS restaurant_name 
+        FROM restaurant_opening JOIN restaurant ON restaurant.id = restaurant_opening.restaurant_id 
+        WHERE restaurant_opening.weekday = %(weekday_1)s AND restaurant_opening.start < %(start_1)s AND restaurant_opening."end" > %(end_1)s
+        """
+        restaurants = stmt.all()
+        """
+        "openingHours": "Mon 10 am - 5:30 pm / Tues 4:15 pm - 3:15 am / Weds 1:15 pm - 6 pm / Thurs 9 am - 2:45 am / Fri - Sat 12:15 pm - 12:30 am / Sun 11:30 am - 6 pm",
+        "restaurantName": "Zinc Restaurant"
+
+        select * from restaurant where name = 'Zinc Restaurant';
+
+        select * from restaurant_opening where restaurant_id = 2182;        
+
+        >>> from dateutil.parser import parse
+        >>> parse('00:00:00').time() > parse('16:15:00').time()
+        False
+
+        >>> parse('11:59:59.999999 pm').time() > parse('16:15:00').time()
+        True
+
+        >>> parse('04/10/2020 03:14 AM').time()
+        """
+        # FIXME: found issue with openings data stored in the database
+        # for i in restaurants:
+        #     if i[0] == 'Zinc Restaurant':
+        #         print('BINGO!')
+        #         break
+        
+
+        breakpoint()
+
+        # method 2: joinedload(), load_only()
+        # stmt = (db.session.query(RestaurantOpening)
+        #     .join(RestaurantOpening.restaurant)
+        #     .filter(RestaurantOpening.weekday == dt.weekday())
+        #     .filter(RestaurantOpening.start < dt.time())
+        #     .filter(RestaurantOpening.end > dt.time())
+        #     .options(joinedload(RestaurantOpening.restaurant))
+        #     # .options(load_only(Restaurant.name))
+        # )
+        # print(stmt)
+
+        # method 3: db.session.execute()
         # stmt = (select(RestaurantOpening.restaurant)
         #     .where(RestaurantOpening.weekday == dt.weekday())
         #     .where(RestaurantOpening.start < dt.time())
         #     .where(RestaurantOpening.end > dt.time()))
-        # """SELECT restaurant_opening.id, restaurant_opening.restaurant_id, restaurant_opening.weekday, restaurant_opening.start, restaurant_opening."end" 
-        # FROM restaurant_opening 
-        # WHERE restaurant_opening.weekday = :weekday_1 AND restaurant_opening.start < :start_1 AND restaurant_opening."end" > :end_1
-
-        # SELECT restaurant.id = restaurant_opening.restaurant_id AS restaurant 
-        # FROM restaurant, restaurant_opening 
-        # WHERE restaurant_opening.weekday = :weekday_1 AND restaurant_opening.start < :start_1 AND restaurant_opening."end" > :end_1
-        # """    
         # logger.debug(f'stmt: {stmt}')
-        # result = db.session.execute(stmt)
-        # resta_openings = result.fetchall()
+        # result = db.session.execute(stmt).fetchall()
 
-        # method 2:
-        restaurants = (db.session.query(RestaurantOpening)
-            .join(RestaurantOpening.restaurant)
-            .options(joinedload(RestaurantOpening.restaurant))
-            .filter(RestaurantOpening.weekday == dt.weekday())
-            .filter(RestaurantOpening.start < dt.time())
-            .filter(RestaurantOpening.end > dt.time())
-        )
-        """SELECT restaurant_opening.id AS restaurant_opening_id, restaurant_opening.restaurant_id AS restaurant_opening_restaurant_id, restaurant_opening.weekday AS restaurant_opening_weekday, restaurant_opening.start AS restaurant_opening_start, restaurant_opening."end" AS restaurant_opening_end, restaurant_1.id AS restaurant_1_id, restaurant_1.name AS restaurant_1_name, restaurant_1.cash_balance AS restaurant_1_cash_balance 
-        FROM restaurant_opening JOIN restaurant ON restaurant.id = restaurant_opening.restaurant_id LEFT OUTER JOIN restaurant AS restaurant_1 ON restaurant_1.id = restaurant_opening.restaurant_id 
-        WHERE restaurant_opening.weekday = %(weekday_1)s AND restaurant_opening.start < %(start_1)s AND restaurant_opening."end" > %(end_1)s
-        """
-        restaurants.all()
-        breakpoint()
+        
+
+        
 
 class CustomerService():
 

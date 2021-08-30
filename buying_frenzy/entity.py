@@ -21,7 +21,6 @@ class RestaurantEntity():
         self.__opening_hours(item['openingHours'])
         # print(f'RestaurantEntity: {self}')
         # print(f'opening_hours {len(self.opening_hours)}')
-        # FIXME: the opening_hours kept accumulating
         # breakpoint()
 
     def __menu(self, items: list):
@@ -32,15 +31,41 @@ class RestaurantEntity():
         self.opening_hours = list()
         for i in (i.strip() for i in item.split(' / ')):
             j = (j for j in re.split(r'(?<=\w)\s+(?=\d)', i, maxsplit=2))
-            weekday_str = next(j)
+            weekday = next(j)
             time_range = next(j)
-            days = self.__weekday(weekday_str)
-            # print(f'weekday_str: {weekday_str}')
+            days = self.__weekday(weekday)
+            # print(f'weekday: {weekday}')
             # print(f'time_range: {time_range}')
             # print(f'days: {days}')
-            self.opening_hours += [Opening(k, time_range) for k in days]
+            for k in days:
+                time_range_split = self.__time_range(time_range)
+                if len(time_range_split) == 2:
+                    next_k = k + 1 if k < 6 else 0
+                    self.opening_hours += [Opening(k, time_range_split[0])]
+                    self.opening_hours += [Opening(next_k, time_range_split[1])]
+                else:
+                    self.opening_hours += [Opening(k, time_range)]
 
-    def __weekday(self, item: str) -> tuple:
+    # FIXME: could be optimized by refactoring 
+    def __time_range(self, time_range: str) -> tuple[str]:
+        """(Patch) Special care on start > end cases, which denotes to a cross day time range
+        e.g. 
+        4:15 pm - 3:15 am
+        5:00 am - 4:00 am
+
+        >>> parse('11:59:59.999999 pm').time() > parse('16:15:00').time()
+        True
+        """
+        # logger.debug('start __time_range()...')
+        time_range_split: tuple = (time_range,)
+        times = tuple(i.strip() for i in time_range.split('-', maxsplit=2))
+        (start, end) = times
+        if parse(start).time() > parse(end).time() and parse(end).time() != parse('12 am').time():
+            time_range_split = (f'{start} - 11:59:59.999999 pm', f'12:00 am - {end}')
+            # logger.debug(f'[{self.name}] {time_range_split}')
+        return time_range_split
+
+    def __weekday(self, item: str) -> tuple[int]:
         """parse the string into a set of numbers which
         each denotes to a specific day of week.
 
@@ -116,7 +141,22 @@ class Dish():
         )
 
 class Opening():
-    """Denotes the opening period of each day
+    """Redesign required!
+    
+    Denotes the opening period of each `representative` day
+
+    This:
+    Tues 4:15 pm - 3:15 am / Weds 1:15 pm - 6 pm
+
+    Should denote to:
+    - Tues 16:15 - 24:00
+    - Weds 24:00 - 3:15
+    - Weds 13:15 - 18:00
+
+    Just found data of this kind: 
+    "openingHours": "Mon 10 am - 5:30 pm / Tues 4:15 pm - 3:15 am / Weds 1:15 pm - 6 pm / Thurs 9 am - 2:45 am / Fri - Sat 12:15 pm - 12:30 am / Sun 11:30 am - 6 pm",
+    "restaurantName": "Zinc Restaurant"  
+
     """
     weekday: int = None
     start_str: str = None
@@ -133,6 +173,9 @@ class Opening():
         """Parse start/end time from string like:
         7:45 am - 10 am
         2:30 pm - 8 pm
+        4:15 pm - 3:15 am*
+
+        *should be split into two records, each under different weekdays 
         """
         if '-' not in time_range:
             raise Exception(' - should be in it')

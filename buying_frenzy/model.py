@@ -6,18 +6,6 @@ from sqlalchemy.orm import relationship
 from . import db
 # import the SQLAlchemy instance so the models can inherit from it
 
-
-# weekday = {
-#     "Sunday": 1,
-#     "Monday": 2,
-#     "Tuesday": 3,
-#     "Wednesday": 4,
-#     "Thrusday": 5,
-#     "Friday": 6,
-#     "Saturday": 7
-# }
-# Return day of the week, where Monday == 0 ... Sunday == 6.
-
 class Restaurant(db.Model):
     __tablename__ = 'restaurant'
     id = Column(Integer, primary_key=True)
@@ -43,6 +31,7 @@ class RestaurantOpening(db.Model):
         foreign_keys=restaurant_id,
         single_parent=True
     )
+    # there could be multiple records for a weekday
     weekday = Column(Integer, nullable=False, index=True)
     start = Column(Time, nullable=False)
     end = Column(Time, nullable=False)
