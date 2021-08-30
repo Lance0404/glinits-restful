@@ -41,8 +41,8 @@ def list_top_restaurant_by_dish_count(restaurant_count: str, action: str, dish_c
     except ValueError as e:
         raise InvalidUrlPath(f'{request.url}')
     
-    list_by_dish_count_and_price_range(restaurant_count, action, dish_count,
+    data = list_by_dish_count_and_price_range(restaurant_count, action, dish_count,
         max = request.args.get('max', float('inf')), 
         min = request.args.get('min', 0)
     )
-    return jsonify()
+    return jsonify([i for i in data])

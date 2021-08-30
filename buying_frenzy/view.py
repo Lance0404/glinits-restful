@@ -12,7 +12,12 @@ def list_restaurant(dt: str=None) -> list:
     dt = parse(dt) if dt else datetime.now()
     return [i for i in RestaurantService.list_available_restaurant_by(dt)]
     
-def list_by_dish_count_and_price_range(restaurant_count: int, action: str, dish_count: int, **kwargs):
+def list_by_dish_count_and_price_range(restaurant_count: int, action: str, dish_count: int, **kwargs) -> Generator:
     logger.info(f'start list_by_dish_count_and_price_range({restaurant_count}, {action}, {dish_count}, {kwargs})...')
-    RestaurantService.list_by_dish_count_and_price_range(restaurant_count, action, dish_count, **kwargs)
-    breakpoint()
+    for i in RestaurantService.list_by_dish_count_and_price_range(restaurant_count, action, dish_count, **kwargs):
+        yield dict(
+            restaurant_name = i[0],
+            dish_count = i[1]
+        )
+
+# TODO: Search for restaurants or dishes by name, ranked by relevance to search term        

@@ -2,6 +2,7 @@ from typing import Generator
 from flask import current_app
 from datetime import datetime, time
 from sqlalchemy import select, func
+from sqlalchemy.sql.expression import label
 from sqlalchemy.orm import joinedload, load_only
 
 from .entity import RestaurantEntity, CustomerEntity
@@ -110,8 +111,13 @@ class RestaurantService():
         """
 
     @classmethod
-    def list_by_dish_count_and_price_range(cls, restaurant_count: int, action: str, dish_count: int, **kwargs):
-        """
+    def list_by_dish_count_and_price_range(cls, restaurant_count: int, action: str, dish_count: int, **kwargs) -> Generator:
+        """Objective: 
+        1. filter by price range
+        2. filter by more or less of the dish count
+        3. limit with top restaurant count 
+
+        Currently ordered by dish count in desc
 
         Target SQL:
 
@@ -127,21 +133,28 @@ ORDER BY counts DESC, b.name ASC
         session.query(Table.column, func.count(Table.column)).group_by(Table.column).all()
         """
         logger.info('start list_by_dish_count_and_price_range()...')
-        stmt = (db.session.query(Restaurant.name, func.count(RestaurantMenu.id))
+        count_ = func.count(RestaurantMenu.id)
+        stmt = (db.session.query(Restaurant.name,
+            label('count', count_))
             .select_from(RestaurantMenu)
             .join(RestaurantMenu.restaurant)
             .filter(RestaurantMenu.price <= kwargs['max'])
             .filter(RestaurantMenu.price >= kwargs['min'])
             .group_by(Restaurant.name)
         )
-        logger.debug(stmt)
+        # [lifesaver](https://stackoverflow.com/a/34829004)
+        stmt = (stmt.having(count_ >= dish_count) if action == 'more' 
+            else stmt.having(count_ <= dish_count))
+        stmt = stmt.order_by(count_.desc()).limit(restaurant_count)
+        # logger.debug(stmt)
         """
-SELECT restaurant.name AS restaurant_name, count(restaurant_menu.id) AS count_1 
+SELECT restaurant.name AS restaurant_name, count(restaurant_menu.id) AS count 
 FROM restaurant_menu JOIN restaurant ON restaurant.id = restaurant_menu.restaurant_id 
-WHERE restaurant_menu.price <= %(price_1)s AND restaurant_menu.price >= %(price_2)s GROUP BY restaurant.name
+WHERE restaurant_menu.price <= %(price_1)s AND restaurant_menu.price >= %(price_2)s GROUP BY restaurant.name 
+HAVING count(restaurant_menu.id) <= %(count_1)s ORDER BY count(restaurant_menu.id) DESC
         """
         result = stmt.all()
-        breakpoint()
+        return (i for i in result)
         
 
         
