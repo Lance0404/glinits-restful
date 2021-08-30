@@ -16,6 +16,7 @@ class RestaurantEntity():
     def __init__(self, item: dict) -> None:
         self.name = item['restaurantName']
         self.cash_balance = item['cashBalance']
+        # logger.debug(f'name {self.name}')
         self.__menu(item['menu'])
         self.__opening_hours(item['openingHours'])
         # print(f'RestaurantEntity: {self}')
@@ -27,24 +28,23 @@ class RestaurantEntity():
         self.menu = [Dish(i['dishName'], i['price']) for i in items]
 
     def __opening_hours(self, item: str):
-        # # FIXME: Lance hardcode test
-        # item = 'Mon - Weds 12:45 pm - 8:30 pm / Thurs 12:45 pm - 2:45 am / Fri - Sat 5:15 am - 6:30 pm / Sun 2:30 pm - 5:30 pm'
-        
         # initialize with empty list
         self.opening_hours = list()
         for i in (i.strip() for i in item.split(' / ')):
             j = (j for j in re.split(r'(?<=\w)\s+(?=\d)', i, maxsplit=2))
-            day_of_week_str = next(j)
+            weekday_str = next(j)
             time_range = next(j)
-            days = self.__day_of_week(day_of_week_str)
-            # print(f'day_of_week_str: {day_of_week_str}')
+            days = self.__weekday(weekday_str)
+            # print(f'weekday_str: {weekday_str}')
             # print(f'time_range: {time_range}')
             # print(f'days: {days}')
             self.opening_hours += [Opening(k, time_range) for k in days]
 
-    def __day_of_week(self, item: str) -> tuple:
+    def __weekday(self, item: str) -> tuple:
         """parse the string into a set of numbers which
         each denotes to a specific day of week.
+
+        # FIXME: align the with the weekday indices of package `datetime`
 
         Pattern could be one of these:
             Mon, Fri
@@ -52,21 +52,20 @@ class RestaurantEntity():
             Thurs
             Sat
             Sun
-            Sat - Sun (6 - 0)*
-            Sun - Mon (0 - 1)
+            Sat - Sun (5 - 6)
+            Sun - Mon (6 - 0)*
 
-        Beware of ranges involve Sun(0)            
+        *requires special handle          
         """
-        # sun(0), mon(1), tue(2), ..., sat(6) 
-        days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
+        weekdays = ('mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun',)
 
         def one_word_to_one_num(item: str) -> int:
-            for i in days:
+            for i in weekdays:
                 if i in item.lower():
-                    return days.index(i)
+                    return weekdays.index(i)
 
-            logger.error(f'item {item} no match to days!')
-            raise Exception('no match to days!')                    
+            logger.error(f'item {item} no match to weekdays!')
+            raise Exception('no match to weekdays!')                    
 
         with_comma = ',' in item
         with_hyphen = '-' in item
@@ -78,9 +77,10 @@ class RestaurantEntity():
             start_and_end = (one_word_to_one_num(i.strip()) for i in item.split('-', maxsplit=2))
             start = next(start_and_end)
             end = next(start_and_end)
-            # CAVEAT: handle if end is Sun(0)
+            # CAVEAT: handle Sun - Mon (6 - 0) or Sat - Mon (5 - 0) cases
             if end == 0:
-                day_indices = tuple([i for i in range(start, days.index('sat') + 1)] + [0])
+                day_indices = tuple([i for i in range(start, len(weekdays))] + [0])
+                # logger.debug(f'name {self.name}, day_indices {day_indices}')
             else:
                 day_indices = tuple(i for i in range(start, end + 1))
         else:
@@ -118,15 +118,15 @@ class Dish():
 class Opening():
     """Denotes the opening period of each day
     """
-    day_of_week: int = None
+    weekday: int = None
     start_str: str = None
     end_str: str = None
     start: time = None
     end: time = None
 
-    def __init__(self, day_of_week: int, time_range: str) -> None:
-        # logger.debug(f'{day_of_week} => {time_range}')
-        self.day_of_week = day_of_week
+    def __init__(self, weekday: int, time_range: str) -> None:
+        # logger.debug(f'{weekday} => {time_range}')
+        self.weekday = weekday
         self.__str_to_time(time_range)
 
     def __str_to_time(self, time_range: str):
@@ -148,7 +148,7 @@ class Opening():
 
     def __repr__(self) -> str:
         return dict(
-            day_of_week = self.day_of_week,
+            weekday = self.weekday,
             start = self.start.__repr__(),
             end = self.end.__repr__()
         )

@@ -131,3 +131,4 @@ docker-compose up -d
     * In short, put model code before create_all() 
 1. [sqlalchemy tables with relationship & Alembic example](https://blog.techbridge.cc/2017/08/12/python-web-flask101-tutorial-sqlalchemy-orm-database-models/)
 1. [sqlalchemy ORM query guide](https://docs.sqlalchemy.org/en/14/orm/queryguide.html)
+1. [relationship loading technique](https://docs.sqlalchemy.org/en/14/orm/loading_relationships.html)

@@ -1,3 +1,4 @@
+import json
 from typing import Generator, Tuple
 
 from . import db
@@ -9,6 +10,12 @@ from .factory import app
 def drop_all_tables():
     db.drop_all()
     db.session.commit()
+
+def json_to_generator(path: str) -> Generator:
+    """
+    read large json file directly into a Generator type 
+    """
+    return (i for i in json.load(open(path)))
 
 def process_restaurant_data(data: Generator):
     """Import data to database
@@ -51,6 +58,7 @@ def integrate_restaurant_and_user_data(restaurant_data: Generator, user_data: Ge
     # app.logger.debug(restaurant_gain)
 
     new_restaurant_data: Generator = (process_a_restaurant_cash_balance(i, restaurant_gain) for i in restaurant_data)
+    app.logger.info('finished integrate_restaurant_and_user_data()')
     return (new_restaurant_data, new_user_data,)
 
 def get_restaurant_gain_and_modify_user_data(restaurant_gain: dict, user_data: Generator) -> Generator:

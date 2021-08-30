@@ -1,12 +1,10 @@
 import click
-import json
-from typing import Generator, Iterator
 from deprecated import deprecated
 
 from buying_frenzy.factory import app
 from buying_frenzy.utility import (
     drop_all_tables, process_restaurant_data, process_user_data,
-    integrate_restaurant_and_user_data
+    integrate_restaurant_and_user_data, json_to_generator
 )
 
 @app.cli.command("drop-all")
@@ -17,13 +15,6 @@ def drop_all():
     app.logger.info('to drop all tables')
     drop_all_tables()
     app.logger.info('all tables dropped')
-
-def json_to_generator(path: str) -> Generator:
-    """
-    read large json file directly into a Generator type 
-    """
-    return (i for i in json.load(open(path)))
-
 
 @app.cli.command("pre-etl")
 def pre_etl():
@@ -42,7 +33,7 @@ def pre_etl():
     resta_generator = json_to_generator('data/restaurant_with_menu.json')
     user_generator = json_to_generator('data/users_with_purchase_history.json')
     (new_resta_generator, new_user_generator) = integrate_restaurant_and_user_data(resta_generator, user_generator)
-    # process_restaurant_data(new_resta_generator)
+    process_restaurant_data(new_resta_generator)
     process_user_data(new_user_generator)
 
 # FIXME: currently not used

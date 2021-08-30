@@ -6,15 +6,17 @@ from sqlalchemy.orm import relationship
 from . import db
 # import the SQLAlchemy instance so the models can inherit from it
 
-day_of_week = {
-    "Sunday": 1,
-    "Monday": 2,
-    "Tuesday": 3,
-    "Wednesday": 4,
-    "Thrusday": 5,
-    "Friday": 6,
-    "Saturday": 7
-}
+
+# weekday = {
+#     "Sunday": 1,
+#     "Monday": 2,
+#     "Tuesday": 3,
+#     "Wednesday": 4,
+#     "Thrusday": 5,
+#     "Friday": 6,
+#     "Saturday": 7
+# }
+# Return day of the week, where Monday == 0 ... Sunday == 6.
 
 class Restaurant(db.Model):
     __tablename__ = 'restaurant'
@@ -37,19 +39,22 @@ class RestaurantOpening(db.Model):
     __tablename__ = 'restaurant_opening'
     id = Column(Integer, primary_key=True)
     restaurant_id = Column(Integer, ForeignKey('restaurant.id', ondelete='CASCADE'), index=True)
-    restaurant = relationship('Restaurant', foreign_keys=restaurant_id, single_parent=True)
-    day_of_week = Column(Integer, nullable=False, index=True)
+    restaurant = relationship('Restaurant',
+        foreign_keys=restaurant_id,
+        single_parent=True
+    )
+    weekday = Column(Integer, nullable=False, index=True)
     start = Column(Time, nullable=False)
     end = Column(Time, nullable=False)
 
-    def __init__(self, restaurant_id, day_of_week, start, end):
+    def __init__(self, restaurant_id, weekday, start, end):
         self.restaurant_id = restaurant_id
-        self.day_of_week = day_of_week
+        self.weekday = weekday
         self.start = start
         self.end = end
 
     def __repr__(self):
-        return f'<RestaurantOpening {self.id} {self.restaurant_id} {self.day_of_week} {self.start} {self.end}>'
+        return f'<RestaurantOpening {self.id} {self.restaurant_id} {self.weekday} {self.start} {self.end}>'
 
 class RestaurantMenu(db.Model):
     __tablename__ = 'restaurant_menu'
