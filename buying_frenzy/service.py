@@ -134,8 +134,7 @@ ORDER BY counts DESC, b.name ASC
         """
         logger.info('start list_by_dish_count_and_price_range()...')
         count_ = func.count(RestaurantMenu.id)
-        stmt = (db.session.query(Restaurant.name,
-            label('count', count_))
+        stmt = (db.session.query(Restaurant.name, count_)
             .select_from(RestaurantMenu)
             .join(RestaurantMenu.restaurant)
             .filter(RestaurantMenu.price <= kwargs['max'])
@@ -156,8 +155,23 @@ HAVING count(restaurant_menu.id) <= %(count_1)s ORDER BY count(restaurant_menu.i
         result = stmt.all()
         return (i for i in result)
         
+    @classmethod
+    def search_by_type_and_term(cls, term: str) -> Generator:
+        logger.info(f'start search_by_type_and_term({term})...')
+        stmt = (db.session.query(Restaurant.name, Restaurant.id)
+            .select_from(Restaurant)
+            .filter(Restaurant.name.ilike(f'%{term}%'))
+            .order_by(Restaurant.name)
+        )
+        logger.debug(stmt)
+        """
+SELECT restaurant.name AS restaurant_name 
+FROM restaurant, restaurant_menu 
+WHERE restaurant_menu.price LIKE %(price_1)s    
+        """
+        result = stmt.all()
+        return (i for i in result)
 
-        
 
 class CustomerService():
 
@@ -173,3 +187,30 @@ class CustomerService():
             [db.session.add(CustomerHistory(customer_entity.id, i.dish_name, i.restaurant_name, i.trans_amount, i.trans_date)) for i in customer_entity.purchase_history]
         commit()
 
+    @classmethod
+    def search_by_type_and_term(cls, term: str):
+        logger.info(f'start search_by_type_and_term({term})...')
+        stmt = (db.session.query(RestaurantMenu.dish_name, RestaurantMenu.id)
+            .select_from(RestaurantMenu)
+            .filter(RestaurantMenu.dish_name.ilike(f'%{term}%'))
+            .order_by(RestaurantMenu.dish_name)
+        )
+        logger.debug(stmt)
+        """
+SELECT customer.name AS customer_name 
+FROM customer 
+WHERE customer.name LIKE %(name_1)s ORDER BY customer.name   
+        """
+        result = stmt.all()
+        return (i for i in result)
+
+    @classmethod
+    def buy(cls, user_id: int, restaurant_id: int, dish_id: int):
+        """
+        Sequence 
+        1. query dish price from `RestaurantMenu`
+        2. deduct customer's cashBalance
+        3. add to restaurant's cashBalance
+        """
+        logger.info(f'start {cls.__name__}.buy()...')
+        
