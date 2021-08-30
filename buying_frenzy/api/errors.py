@@ -12,3 +12,12 @@ class Common(Exception):
 
     def __str__(self):
         return f'customized message for print here: {self.message}'
+
+class InvalidUrlPath(Exception):
+    message = "Invalid URL path: "
+    def __init__(self, action: str):
+        self.message += action
+        super().__init__(self.message)
+
+    def __str__(self):
+        return f'<InvalidUrlPath: {self.message}>'

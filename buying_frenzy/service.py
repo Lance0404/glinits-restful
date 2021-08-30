@@ -1,6 +1,7 @@
+from typing import Generator
 from flask import current_app
 from datetime import datetime, time
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.orm import joinedload, load_only
 
 from .entity import RestaurantEntity, CustomerEntity
@@ -46,7 +47,7 @@ class RestaurantService():
         commit()
 
     @classmethod
-    def list_available_restaurant_by(cls, dt: datetime):
+    def list_available_restaurant_by(cls, dt: datetime) -> Generator:
         # FIXME: should intake datetime which carries day of week information
         logger.debug(f'start list_available_restaurant_by({dt})')
         logger.debug(f'weekday {dt.weekday()}, time {dt.time()}')
@@ -56,8 +57,8 @@ class RestaurantService():
             .select_from(RestaurantOpening)
             .join(RestaurantOpening.restaurant)
             .filter(RestaurantOpening.weekday == dt.weekday())
-            .filter(RestaurantOpening.start < dt.time())
-            .filter(RestaurantOpening.end > dt.time())            
+            .filter(RestaurantOpening.start <= dt.time())
+            .filter(RestaurantOpening.end >= dt.time())            
         )
         logger.debug(stmt)
         """
@@ -65,6 +66,7 @@ class RestaurantService():
         FROM restaurant_opening JOIN restaurant ON restaurant.id = restaurant_opening.restaurant_id 
         WHERE restaurant_opening.weekday = %(weekday_1)s AND restaurant_opening.start < %(start_1)s AND restaurant_opening."end" > %(end_1)s
         """
+        
         restaurants = stmt.all()
         """
         "openingHours": "Mon 10 am - 5:30 pm / Tues 4:15 pm - 3:15 am / Weds 1:15 pm - 6 pm / Thurs 9 am - 2:45 am / Fri - Sat 12:15 pm - 12:30 am / Sun 11:30 am - 6 pm",
@@ -72,7 +74,7 @@ class RestaurantService():
 
         select * from restaurant where name = 'Zinc Restaurant';
 
-        select * from restaurant_opening where restaurant_id = 2182;        
+        select * from restaurant_opening where restaurant_id = 2182;  
 
         >>> from dateutil.parser import parse
         >>> parse('00:00:00').time() > parse('16:15:00').time()
@@ -83,34 +85,63 @@ class RestaurantService():
 
         >>> parse('04/10/2020 03:14 AM').time()
         """
-        # FIXME: found issue with openings data stored in the database
-        # for i in restaurants:
-        #     if i[0] == 'Zinc Restaurant':
-        #         print('BINGO!')
-        #         break
-        
+        return (i[0] for i in restaurants)
 
+        """
+        # might be useful someday
+        method 2: joinedload(), load_only()
+        stmt = (db.session.query(RestaurantOpening)
+            .join(RestaurantOpening.restaurant)
+            .filter(RestaurantOpening.weekday == dt.weekday())
+            .filter(RestaurantOpening.start < dt.time())
+            .filter(RestaurantOpening.end > dt.time())
+            .options(joinedload(RestaurantOpening.restaurant))
+            # .options(load_only(Restaurant.name))
+        )
+        print(stmt)
+
+        method 3: db.session.execute()
+        stmt = (select(RestaurantOpening.restaurant)
+            .where(RestaurantOpening.weekday == dt.weekday())
+            .where(RestaurantOpening.start < dt.time())
+            .where(RestaurantOpening.end > dt.time()))
+        logger.debug(f'stmt: {stmt}')
+        result = db.session.execute(stmt).fetchall()
+        """
+
+    @classmethod
+    def list_by_dish_count_and_price_range(cls, restaurant_count: int, action: str, dish_count: int, **kwargs):
+        """
+
+        Target SQL:
+
+SELECT b.name, count(a.id) counts
+FROM public.restaurant_menu a
+JOIN restaurant b ON a.restaurant_id = b.id 
+WHERE a.price <= 20 AND a.price >= 15 
+GROUP BY b.name 
+HAVING count(a.id) >= 2
+ORDER BY counts DESC, b.name ASC
+
+        [ref](https://stackoverflow.com/a/4086229)
+        session.query(Table.column, func.count(Table.column)).group_by(Table.column).all()
+        """
+        logger.info('start list_by_dish_count_and_price_range()...')
+        stmt = (db.session.query(Restaurant.name, func.count(RestaurantMenu.id))
+            .select_from(RestaurantMenu)
+            .join(RestaurantMenu.restaurant)
+            .filter(RestaurantMenu.price <= kwargs['max'])
+            .filter(RestaurantMenu.price >= kwargs['min'])
+            .group_by(Restaurant.name)
+        )
+        logger.debug(stmt)
+        """
+SELECT restaurant.name AS restaurant_name, count(restaurant_menu.id) AS count_1 
+FROM restaurant_menu JOIN restaurant ON restaurant.id = restaurant_menu.restaurant_id 
+WHERE restaurant_menu.price <= %(price_1)s AND restaurant_menu.price >= %(price_2)s GROUP BY restaurant.name
+        """
+        result = stmt.all()
         breakpoint()
-
-        # method 2: joinedload(), load_only()
-        # stmt = (db.session.query(RestaurantOpening)
-        #     .join(RestaurantOpening.restaurant)
-        #     .filter(RestaurantOpening.weekday == dt.weekday())
-        #     .filter(RestaurantOpening.start < dt.time())
-        #     .filter(RestaurantOpening.end > dt.time())
-        #     .options(joinedload(RestaurantOpening.restaurant))
-        #     # .options(load_only(Restaurant.name))
-        # )
-        # print(stmt)
-
-        # method 3: db.session.execute()
-        # stmt = (select(RestaurantOpening.restaurant)
-        #     .where(RestaurantOpening.weekday == dt.weekday())
-        #     .where(RestaurantOpening.start < dt.time())
-        #     .where(RestaurantOpening.end > dt.time()))
-        # logger.debug(f'stmt: {stmt}')
-        # result = db.session.execute(stmt).fetchall()
-
         
 
         
