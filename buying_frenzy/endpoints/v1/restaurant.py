@@ -68,7 +68,7 @@ class SearchBy(Resource):
     Did not implement fancy recommendation algorithm under the hood
     """
 
-    @ns_rest.doc(description="Search for restaurants or dishes by name, ranked by relevance to search term")
+    @ns_rest.doc(params=dict(type_='[restaurant/dish]', term='to search for'), description="Search for restaurants or dishes by name, ranked by relevance to search term")
     def get(self, type_: str, term: str):
         """Search for restaurants or dishes by name, ranked by relevance"""
         logger.info(f'start search_by(type={type_}, term={term})...')
@@ -84,7 +84,7 @@ class Buy(Resource):
     TODO: consider using restaurant pk or dish id for search
     """
     
-    @ns_user.doc(description="Process a user purchasing a dish from a restaurant, handling all relevant data changes in an atomic transaction")
+    @ns_user.doc(params=dict(user_id='user id', restaurant_id='restaurant id', dish_id='dish id'), description="Process a user purchasing a dish from a restaurant, handling all relevant data changes in an atomic transaction")
     def put(self, user_id: int, restaurant_id: int, dish_id: int):
         """User buy a dish from a restaurant"""
         logger.info(f'start buy({user_id}, {restaurant_id}, {dish_id})')

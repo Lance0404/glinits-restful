@@ -1,11 +1,13 @@
 import click
 from deprecated import deprecated
+from flask import json
 
 from buying_frenzy.factory import app
 from buying_frenzy.utility import (
     drop_all_tables, process_restaurant_data, process_user_data,
     integrate_restaurant_and_user_data, json_to_generator
 )
+from buying_frenzy.endpoints.v1.restaurant import api
 
 @app.cli.command("drop-all")
 def drop_all():
@@ -55,6 +57,14 @@ def etl(path):
     elif 'users_with_purchase_history' in path:
         process_user_data(data_generator)
     app.logger.info('end ETL')
+
+@app.cli.command("postman")
+def to_postman():
+    urlvars = False  # Build query strings in URLs
+    swagger = True  # Export Swagger specifications
+    data = api.as_postman(urlvars=urlvars, swagger=swagger)
+    with open('data/glinits.json', 'w') as outfile:
+        json.dump(data, outfile)
 
 if __name__ == '__main__':
     app.run()

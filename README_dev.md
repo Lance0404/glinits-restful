@@ -133,6 +133,7 @@ docker-compose up -d
 1. [static, class, instance method](https://www.learncodewithmike.com/2020/01/python-method.html)
 1. [basic relationship pattern](https://docs.sqlalchemy.org/en/14/orm/basic_relationships.html)
 1. [breakpoint()](https://www.journaldev.com/22695/python-breakpoint)
+1. [how to modify a specific commit](https://stackoverflow.com/a/1186549)
 
 ### Issues with solutions
 1. [sqlalchemy create all does not create tables](https://stackoverflow.com/a/20749534)
@@ -142,3 +143,7 @@ docker-compose up -d
 1. [relationship loading technique](https://docs.sqlalchemy.org/en/14/orm/loading_relationships.html)
 1. [sqlalchemy session rollback](https://docs.sqlalchemy.org/en/14/orm/tutorial.html#rolling-back)
 1. [Flask-RESTX](https://flask-restx.readthedocs.io/en/latest/)
+1. [convert postman collection format from v1 to v2](https://learning.postman.com/docs/getting-started/importing-and-exporting-data/#converting-postman-collections-from-v1-to-v2)
+    * `flask postman`
+    * `postman-collection-transformer convert -i data/glinits.json -o data/glinits_v2.json -j 1.0.0 -p 2.0.0 -P`
+    * `cp data/glinits_v2.json /mnt/c/Users/lance/Downloads`
