@@ -1,4 +1,5 @@
 # TODO: find a lib that binds corresponding messages to status code
+# TODO: try to handle all errors in `buying_frenzy/errors.py`
 from flask import jsonify, current_app
 
 from buying_frenzy.errors import Common

@@ -1,4 +1,5 @@
-# TODO: this file is having duplicated functionality as `buying_frenzy/api/__init__.py`
+# TODO: this file is having duplicated functionality as `buying_frenzy/endpoints/__init__.py`
+# TODO: try to handle all errors in `buying_frenzy/errors.py`
 from flask import jsonify
 
 from .hello import bp

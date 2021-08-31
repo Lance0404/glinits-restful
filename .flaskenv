@@ -1,6 +1,7 @@
 # public env var
 # FLASK_APP=buying-frenzy
 # FLASKR_SETTINGS=setting.cfg
+RESTX_ERROR_404_HELP=false
 
 # ==== Database-related ====
 # use psql container name instead when the web was also initiated as container

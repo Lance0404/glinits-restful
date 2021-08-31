@@ -1,0 +1,161 @@
+{
+    "info": {
+        "_postman_id": "5482e30d-1af5-5ec7-b3f1-ab7d7ba9cbbe",
+        "name": "Buying Frenzy 1.0",
+        "description": "some handy restaurant APIs",
+        "schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "restaurant",
+            "item": [
+                {
+                    "name": "get_list_opening_restaurant",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": "http://localhost:5000/v1/restaurant/list",
+                        "description": "list opened restaurant"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "get_list_top_restaurant_by_dish_and_price",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "http://localhost:5000/v1/restaurant/list/:restaurant_count/dish/:action/:dish_count/price",
+                            "protocol": "http",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "5000",
+                            "path": [
+                                "v1",
+                                "restaurant",
+                                "list",
+                                ":restaurant_count",
+                                "dish",
+                                ":action",
+                                ":dish_count",
+                                "price"
+                            ],
+                            "variable": [
+                                {
+                                    "value": "",
+                                    "key": "action"
+                                },
+                                {
+                                    "value": 0,
+                                    "key": "dish_count"
+                                },
+                                {
+                                    "value": 0,
+                                    "key": "restaurant_count"
+                                }
+                            ]
+                        },
+                        "description": "List top y restaurants by dish count within a price range"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "get_search_by",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "http://localhost:5000/v1/restaurant/search/:type_/:term",
+                            "protocol": "http",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "5000",
+                            "path": [
+                                "v1",
+                                "restaurant",
+                                "search",
+                                ":type_",
+                                ":term"
+                            ],
+                            "variable": [
+                                {
+                                    "value": "",
+                                    "key": "term"
+                                },
+                                {
+                                    "value": "",
+                                    "key": "type_"
+                                }
+                            ]
+                        },
+                        "description": "Search for restaurants or dishes by name, ranked by relevance"
+                    },
+                    "response": []
+                }
+            ],
+            "description": "restaurant operations"
+        },
+        {
+            "name": "user",
+            "item": [
+                {
+                    "name": "put_buy",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://localhost:5000/v1/user/:user_id/buy/:restaurant_id/:dish_id",
+                            "protocol": "http",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "5000",
+                            "path": [
+                                "v1",
+                                "user",
+                                ":user_id",
+                                "buy",
+                                ":restaurant_id",
+                                ":dish_id"
+                            ],
+                            "variable": [
+                                {
+                                    "value": 0,
+                                    "key": "dish_id"
+                                },
+                                {
+                                    "value": 0,
+                                    "key": "restaurant_id"
+                                },
+                                {
+                                    "value": 0,
+                                    "key": "user_id"
+                                }
+                            ]
+                        },
+                        "description": "User buy a dish from a restaurant"
+                    },
+                    "response": []
+                }
+            ],
+            "description": "customer operations"
+        },
+        {
+            "name": "Swagger specifications",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": "http://localhost:5000/v1/swagger.json",
+                "description": "The API Swagger specifications as JSON"
+            },
+            "response": []
+        }
+    ]
+}

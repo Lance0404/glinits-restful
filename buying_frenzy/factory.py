@@ -9,6 +9,8 @@ from buying_frenzy.model import *
 # models should be imported and run before any db related operation 
 # e.g. create_all(), drop_all()
 
+
+
 def create_app():
     """
     database will be create if not exist
@@ -26,11 +28,10 @@ def create_app():
         db.create_all()
         db.session.commit()
 
-        from .api.v1.hello import bp as hello_bp
-        app.register_blueprint(hello_bp, url_prefix='/v1')
-        # above will overwrite the `url_prefix` defined in the Blueprint() constructor
-        from .api.v1.restaurant import bp as restaurant_bp
-        app.register_blueprint(restaurant_bp, url_prefix='/v1/restaurant')
+        from .endpoints.v1.hello import bp as hello_bp
+        app.register_blueprint(hello_bp)
+        from .endpoints.v1.restaurant import bp as restaurant_bp
+        app.register_blueprint(restaurant_bp)
 
     return app
 

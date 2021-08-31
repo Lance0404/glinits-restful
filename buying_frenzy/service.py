@@ -1,4 +1,4 @@
-from buying_frenzy.api.v1 import restaurant
+from buying_frenzy.endpoints.v1 import restaurant
 from typing import Generator
 from flask import current_app
 from datetime import datetime, time

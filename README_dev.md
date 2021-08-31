@@ -113,6 +113,14 @@ docker-compose up -d
 # confirmed that db was gone 
 ```
 
+### Issues
+* give up flask-restplus, since it has compatibility issue
+```sh
+  Because flask (2.0.1) depends on Werkzeug (>=2.0)
+   and no versions of flask match >2.0.1,<3.0.0, Flask (>=2.0.1,<3.0.0) requires Werkzeug (>=2.0).
+  So, because glints-restful depends on both Flask (^2.0.1) and Werkzeug (0.16.1), version solving failed.
+```  
+
 ### Reference
 1. [Dockerfile example](https://www.mktr.ai/the-data-scientists-quick-guide-to-dockerfiles-with-examples/)
 1. [Flask custom commands](https://flask.palletsprojects.com/en/2.0.x/cli/#custom-commands)
@@ -133,3 +141,4 @@ docker-compose up -d
 1. [sqlalchemy ORM query guide](https://docs.sqlalchemy.org/en/14/orm/queryguide.html)
 1. [relationship loading technique](https://docs.sqlalchemy.org/en/14/orm/loading_relationships.html)
 1. [sqlalchemy session rollback](https://docs.sqlalchemy.org/en/14/orm/tutorial.html#rolling-back)
+1. [Flask-RESTX](https://flask-restx.readthedocs.io/en/latest/)
