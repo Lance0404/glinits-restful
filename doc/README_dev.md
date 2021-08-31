@@ -1,12 +1,11 @@
 # glinits-restful
 
 ## Todo list
-1. setup Ngnix and WSGI server in front of the Flask server
-1. setup Psql db and connect with sqlalchemy from the python app
-1. create RESTful APIs that CRUD against db
 
-## Wish list
-1. come up with a FAST API solution
+1. [flask configuration best practice](https://flask.palletsprojects.com/en/2.0.x/config/#configuration-best-practices)
+1. setup Ngnix and WSGI server in front of the Flask server
+
+
 
 ## RESTful API with Postgresql support
 
@@ -40,11 +39,26 @@
 1. `poetry new glinits-restful` (this should be done before setting up the git repo)
     * or you can do `poetry init` instead from pre-existing project 
 1. specify the python verison for poetry to use
-    * `poetry env use /usr/bin/python`
+    * `poetry env use /usr/bin/python` (Python 3.9.6)
+    * I choose use docker base image `python:3.9.7-slim` 
 
-### install dependencies
-1. `poetry add flask`
-    
+### Docker image
+* docker build --no-cache -t test .
+* docker build --no-cache -t test --progress=plain .
+* docker build -t test --progress=plain .
+* docker build --no-cache -t glinits_app .
+
+### Docker container
+* docker exec -it glinits_app bash
+* docker logs -f -n 10 glinits_app
+* docker-compose logs -f --tail=10 glinits_app
+
+* clean up & initiate app
+```sh
+docker rm glinits_app
+docker rmi glinits_app
+docker-compose up app
+```
 
 ### start the Flask app
 1. while at local dev env
@@ -53,41 +67,21 @@
 flask run
 ```
 
-
 ### Debug
-1. The poetry installed from the `python:3.9.6-slim` image failed to support complete poetry installation. Shows error like below:
-    ```sh
-    => ERROR [builder-base 5/5] RUN poetry install --no-dev                                                                                0.4s
-    ------                                                                                                                                       
-    > [builder-base 5/5] RUN poetry install --no-dev:                                                                                           
-    #10 0.370 Traceback (most recent call last):                                                                                                 
-    #10 0.370   File "/opt/poetry/bin/poetry", line 17, in <module>
-    #10 0.370     from poetry.console import main
-    #10 0.370   File "/opt/poetry/lib/poetry/console/__init__.py", line 1, in <module>
-    #10 0.370     from .application import Application
-    #10 0.370   File "/opt/poetry/lib/poetry/console/application.py", line 1, in <module>
-    #10 0.370     from cleo import Application as BaseApplication
-    #10 0.370 ModuleNotFoundError: No module named 'cleo'
-    ```
-    * so I downgraded the image to `python:3.8-slim` and modified `pyproject.toml` to `python = "^3.8"`. 
-    * [WARNING] This could cause trouble while I was developing with python3.9 by run with python3.8. 
+* Always make sure you are using the same `poetry` version at local and while docker build!
 
-
-1. connect to psql with command
+* connect to psql with command
 ```sh
 # access container
 docker exec -it glinits_psql bash
-
 psql glinits lance
-
 # list tables in current db
 \dt+
-
 # describe table
 \d [tablename]
 ```
 
-1. to drop database (failed)
+1. to drop database (failed, but I have flask cli solution)
 ```sql
 -- try
 DROP DATABASE glinits;
@@ -110,16 +104,8 @@ DROP DATABASE glinits;
 docker-compose down -v
 
 docker-compose up -d
-# confirmed that db was gone 
+# confirmed that db was gone
 ```
-
-### Issues
-* give up flask-restplus, since it has compatibility issue
-```sh
-  Because flask (2.0.1) depends on Werkzeug (>=2.0)
-   and no versions of flask match >2.0.1,<3.0.0, Flask (>=2.0.1,<3.0.0) requires Werkzeug (>=2.0).
-  So, because glints-restful depends on both Flask (^2.0.1) and Werkzeug (0.16.1), version solving failed.
-```  
 
 ### Reference
 1. [Dockerfile example](https://www.mktr.ai/the-data-scientists-quick-guide-to-dockerfiles-with-examples/)
@@ -147,3 +133,6 @@ docker-compose up -d
     * `flask postman`
     * `postman-collection-transformer convert -i data/glinits.json -o data/glinits_v2.json -j 1.0.0 -p 2.0.0 -P`
     * `cp data/glinits_v2.json /mnt/c/Users/lance/Downloads`
+
+## Wish list
+1. come up with a FAST API solution    

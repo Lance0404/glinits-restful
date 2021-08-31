@@ -23,19 +23,34 @@ services:
             - glinits_psql_data:/var/lib/postgresql/data
         ports:
             - "5432:5432"
+        expose:
+            - "5432" 
         restart: always
-    # web:
-    #     container_name: glinits_app
-    #     build:
-    #         context: .
-    #         dockerfile: Dockerfile
-    #     image: glinits_app
-    #     # command: uwsgi --ini uwsgi.ini
-    #     command: flask run --host 0.0.0.0
-    #     # the random IP used in CONTAINER always maps to localhost in HOST
-    #     # use `docker ps` to check for the actual binding
-    #     ports:
-    #         - "5000:5000"
-    #     restart: always
+        networks:
+            - backend        
+    app:
+        container_name: glinits_app
+        build:
+            context: .
+            dockerfile: Dockerfile
+        image: glinits_app
+        env_file:
+            - .env
+        # command: uwsgi --ini uwsgi.ini
+        command: flask run --host 0.0.0.0
+
+        # https://stackoverflow.com/a/45450456
+        # Handy for debug!
+        # command: tail -F anything
+        depends_on:
+            - psql
+        ports:
+            - "5000:5000"
+        restart: always
+        networks:
+            - backend     
 volumes:
     glinits_psql_data:
+
+networks:
+    backend:

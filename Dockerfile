@@ -1,14 +1,14 @@
 ###############################################
 # Base Image
 ###############################################
-FROM python:3.8-slim as python-base
+FROM python:3.9.7-slim as python-base
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=off \
     PIP_DISABLE_PIP_VERSION_CHECK=on \
     PIP_DEFAULT_TIMEOUT=100 \
-    POETRY_VERSION=1.0.5 \
+    POETRY_VERSION=1.1.8 \
     POETRY_HOME="/opt/poetry" \
     POETRY_VIRTUALENVS_IN_PROJECT=true \
     POETRY_NO_INTERACTION=1 \
@@ -27,12 +27,16 @@ RUN apt-get update \
     curl \
     build-essential
 
+RUN echo $(python -V)
+
 # install poetry - respects $POETRY_VERSION & $POETRY_HOME
-RUN curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python
+RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py | python
 
 # copy project requirement files here to ensure they will be cached.
 WORKDIR $PYSETUP_PATH
 COPY poetry.lock pyproject.toml ./
+
+RUN echo $(poetry -V)
 
 # install runtime deps - uses $POETRY_VIRTUALENVS_IN_PROJECT internally
 RUN poetry install --no-dev
@@ -42,10 +46,7 @@ RUN poetry install --no-dev
 ###############################################
 FROM python-base as production
 COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
-COPY app.py ./
-# COPY ./src /src/
-# CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "80"]
 
-# COPY src run_flask_app.sh ./
-# EXPOSE 8000
-# CMD ["./run_flask_app.sh"]
+COPY app.py ./
+COPY buying_frenzy buying_frenzy
+COPY data data

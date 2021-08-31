@@ -9,8 +9,6 @@ from buying_frenzy.model import *
 # models should be imported and run before any db related operation 
 # e.g. create_all(), drop_all()
 
-
-
 def create_app():
     """
     database will be create if not exist

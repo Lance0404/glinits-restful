@@ -183,7 +183,7 @@ class CustomerService():
 
     @classmethod
     def create(cls, customer_entity: CustomerEntity):
-        logger.info(f'start {cls.__name__}.create()...')
+        logger.debug(f'start {cls.__name__}.create()...')
         customer = Customer(customer_entity.id, customer_entity.name, customer_entity.cash_balance)
         db.session.add(customer)
         # FIXME: legacy code
