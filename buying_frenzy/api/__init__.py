@@ -1,7 +1,7 @@
 # TODO: find a lib that binds corresponding messages to status code
 from flask import jsonify, current_app
 
-from .errors import Common
+from buying_frenzy.errors import Common
 
 @current_app.errorhandler(404)
 def page_not_found(error):

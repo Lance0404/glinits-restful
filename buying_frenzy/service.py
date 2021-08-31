@@ -1,3 +1,4 @@
+from buying_frenzy.api.v1 import restaurant
 from typing import Generator
 from flask import current_app
 from datetime import datetime, time
@@ -10,6 +11,7 @@ from .model import (
     Restaurant, RestaurantOpening, RestaurantMenu,
     Customer, CustomerHistory,
 )
+from .errors import CommitError
 from . import db
 
 logger = current_app.logger
@@ -22,7 +24,8 @@ def commit():
         db.session.commit()
     except Exception as e:
         logger.error(e)
-        raise e
+        db.session.rollback()
+        raise CommitError
 
 class RestaurantService():
 
@@ -159,7 +162,7 @@ HAVING count(restaurant_menu.id) <= %(count_1)s ORDER BY count(restaurant_menu.i
     def search_by_type_and_term(cls, term: str) -> Generator:
         logger.info(f'start search_by_type_and_term({term})...')
         stmt = (db.session.query(Restaurant.name, Restaurant.id)
-            .select_from(Restaurant)
+            # .select_from(Restaurant)
             .filter(Restaurant.name.ilike(f'%{term}%'))
             .order_by(Restaurant.name)
         )
@@ -180,6 +183,7 @@ class CustomerService():
 
     @classmethod
     def create(cls, customer_entity: CustomerEntity):
+        logger.info(f'start {cls.__name__}.create()...')
         customer = Customer(customer_entity.id, customer_entity.name, customer_entity.cash_balance)
         db.session.add(customer)
         # FIXME: legacy code
@@ -189,9 +193,8 @@ class CustomerService():
 
     @classmethod
     def search_by_type_and_term(cls, term: str):
-        logger.info(f'start search_by_type_and_term({term})...')
+        logger.info(f'start {cls.__name__}.search_by_type_and_term({term})...')
         stmt = (db.session.query(RestaurantMenu.dish_name, RestaurantMenu.id)
-            .select_from(RestaurantMenu)
             .filter(RestaurantMenu.dish_name.ilike(f'%{term}%'))
             .order_by(RestaurantMenu.dish_name)
         )
@@ -212,5 +215,46 @@ WHERE customer.name LIKE %(name_1)s ORDER BY customer.name
         2. deduct customer's cashBalance
         3. add to restaurant's cashBalance
         """
-        logger.info(f'start {cls.__name__}.buy()...')
+        logger.info(f'start {cls.__name__}.buy(user_id={user_id}, \
+restaurant_id={restaurant_id}, dish_id={dish_id})...')
         
+        stmt = (db.session.query(RestaurantMenu.price)
+            .filter(RestaurantMenu.id == dish_id)
+        )
+        logger.debug(stmt)
+        price = stmt.one()[0]
+        logger.debug(f'price {price}')
+
+        customer = db.session.query(Customer).filter_by(id=user_id).one()
+        logger.debug(f'BEFORE {customer.name} {customer.cash_balance}')
+        customer.cash_balance -= price
+        logger.debug(f'AFTER {customer.name} {customer.cash_balance}')
+        
+        # emit_error()
+        # logger.debug(f'(1)AFTER error {customer.name} {customer.cash_balance}')
+
+        restaurant = db.session.query(Restaurant).filter_by(id=restaurant_id).one()
+        logger.debug(f'BEFORE {restaurant.name} {restaurant.cash_balance}')
+        restaurant.cash_balance += price
+        logger.debug(f'AFTER {restaurant.name} {restaurant.cash_balance}')
+
+        # emit_error()
+        # logger.debug(f'(2)AFTER error {customer.name} {customer.cash_balance}')
+        # logger.debug(f'(2)AFTER error {restaurant.name} {restaurant.cash_balance}')
+
+        commit()
+        logger.debug(f'(2)AFTER commit {customer.name} {customer.cash_balance}')
+        logger.debug(f'(2)AFTER commit {restaurant.name} {restaurant.cash_balance}')
+
+def emit_error():
+    """
+    db.session.rollback() only takes effect before db.session.commit()
+
+    after db.session.commit(), changes in database become irreversible
+    """
+    try:
+        raise CommitError
+    except CommitError:
+        logger.error('error happens!')
+        db.session.rollback()
+        db.session.flush()

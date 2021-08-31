@@ -5,7 +5,7 @@ from flask import (
     request
 )
 
-from .. import errors
+from buying_frenzy.errors import Common
 
 logger = current_app.logger
 bp = Blueprint('hello', __name__, url_prefix='/hello')
@@ -23,4 +23,4 @@ def hello():
 @bp.route('/hello_err', methods=['GET'])
 def hello_err():
     logger.error('hello err')
-    raise errors.Common
+    raise Common()

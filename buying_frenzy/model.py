@@ -21,7 +21,7 @@ class Restaurant(db.Model):
         self.cash_balance = cash_balance
 
     def __repr__(self):
-        return f'<Restaurant {self.id} {self.name} {self.cash_balance}>'
+        return f'<Restaurant id({self.id}), name({self.name}) cash_balance({self.cash_balance})>'
 
 class RestaurantOpening(db.Model):
     __tablename__ = 'restaurant_opening'
@@ -73,6 +73,9 @@ class Customer(db.Model):
         self.id = id
         self.name = name
         self.cash_balance = cash_balance
+
+    def __repr__(self):
+        return f'<Customer id({self.id}), name({self.name}), cash_balance({self.cash_balance})>'        
 
 class CustomerHistory(db.Model):
     __tablename__ = 'customer_history'

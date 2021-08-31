@@ -5,7 +5,7 @@ from flask import (
     request
 )
 
-from ..errors import InvalidUrlPath
+from buying_frenzy.errors import InvalidUrlPath, Common
 from ...view import View
 
 logger = current_app.logger
@@ -53,7 +53,7 @@ def search_by(type_: str, term: str):
 
     Did not implement fancy recommendation algorithm under the hood
     """
-    logger.info('start search_by(type={type}, term={term})...')
+    logger.info(f'start search_by(type={type_}, term={term})...')
     if type_ not in ('restaurant', 'dish'):
         raise InvalidUrlPath(f'{request.url}')
     return jsonify([[i[0], i[1]] for i in View.search_by_type_and_term(type_, term)])
@@ -69,6 +69,7 @@ def buy(user_id: str, restaurant_id: str, dish_id: str):
 
     Example:
     http://localhost:5000/v1/restaurant/user/<user_id>/buy/<restaurant_id>/<dish_id>
+
     """
     logger.info(f'start buy({user_id}, {restaurant_id}, {dish_id})')
     try:
@@ -79,5 +80,4 @@ def buy(user_id: str, restaurant_id: str, dish_id: str):
         logger.error(e)
         raise InvalidUrlPath(f'{request.url}')
     View.buy(user_id, restaurant_id, dish_id)
-        
-    return jsonify()
+    return jsonify('transaction successful')

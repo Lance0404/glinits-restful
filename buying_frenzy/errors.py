@@ -1,4 +1,7 @@
-# Common Exception that may be raise from the API call
+"""
+[ref](https://stackoverflow.com/a/1319675)
+"""
+
 class Common(Exception):
     """Exception raised for common types.
 
@@ -21,3 +24,6 @@ class InvalidUrlPath(Exception):
 
     def __str__(self):
         return f'<InvalidUrlPath: {self.message}>'
+
+class CommitError(Exception):
+    pass
