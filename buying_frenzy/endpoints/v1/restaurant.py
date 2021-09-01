@@ -28,8 +28,8 @@ parser_1 = ns_rest.parser()
 parser_1.add_argument('datetime', type=str, default='08/31/2021 10:37 PM', location='args', help='datetime should be str')
 
 parser_2 = ns_rest.parser()
-parser_2.add_argument('min', type=float, default=500, location='args', help='price range lower bound')
-parser_2.add_argument('max', type=float, default=0, location='args', help='price range upper bound')
+parser_2.add_argument('min', type=float, default=0, location='args', help='price range lower bound')
+parser_2.add_argument('max', type=float, default=500, location='args', help='price range upper bound')
 
 @ns_rest.route("/list")
 @ns_rest.doc(responses={404: "What the fuck is going on"})
@@ -52,7 +52,6 @@ class ListTopRestaurantByDishAndPrice(Resource):
     def get(self, restaurant_count: int, action: str, dish_count: int):
         """List top y restaurants by dish count within a price range"""
         args = parser_2.parse_args(strict=True)
-        breakpoint()
         if action not in ['more', 'less']:
             raise InvalidUrlPath(f'{request.url}')
         data = View.list_by_dish_count_and_price_range(restaurant_count, action, dish_count,
@@ -84,7 +83,7 @@ class Buy(Resource):
     TODO: consider using restaurant pk or dish id for search
     """
     
-    @ns_user.doc(params=dict(user_id='user id', restaurant_id='restaurant id', dish_id='dish id'), description="Process a user purchasing a dish from a restaurant, handling all relevant data changes in an atomic transaction")
+    @ns_user.doc(params=dict(user_id='start from 0', restaurant_id='start from 1', dish_id='start from 1'), description="Process a user purchasing a dish from a restaurant, handling all relevant data changes in an atomic transaction")
     def put(self, user_id: int, restaurant_id: int, dish_id: int):
         """User buy a dish from a restaurant"""
         logger.info(f'start buy({user_id}, {restaurant_id}, {dish_id})')

@@ -27,3 +27,6 @@ class InvalidUrlPath(Exception):
 
 class CommitError(Exception):
     pass
+
+class DishNotInRestaurant(Exception):
+    pass

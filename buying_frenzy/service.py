@@ -11,7 +11,7 @@ from .model import (
     Restaurant, RestaurantOpening, RestaurantMenu,
     Customer, CustomerHistory,
 )
-from .errors import CommitError
+from .errors import CommitError, DishNotInRestaurant
 from . import db
 
 logger = current_app.logger
@@ -218,11 +218,15 @@ WHERE customer.name LIKE %(name_1)s ORDER BY customer.name
         logger.info(f'start {cls.__name__}.buy(user_id={user_id}, \
 restaurant_id={restaurant_id}, dish_id={dish_id})...')
         
-        stmt = (db.session.query(RestaurantMenu.price)
+        stmt = (db.session.query(RestaurantMenu.price, RestaurantMenu.restaurant_id)
             .filter(RestaurantMenu.id == dish_id)
         )
         logger.debug(stmt)
-        price = stmt.one()[0]
+        dish = stmt.one()
+        price = dish[0]
+        dish_restaurant_id = dish[1]
+        if dish_restaurant_id != restaurant_id:
+            raise DishNotInRestaurant
         logger.debug(f'price {price}')
 
         customer = db.session.query(Customer).filter_by(id=user_id).one()
