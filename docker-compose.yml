@@ -35,7 +35,7 @@ services:
             dockerfile: Dockerfile
         image: glinits_app
         env_file:
-            - .env
+            - .flaskenv
         # command: uwsgi --ini uwsgi.ini
         command: flask run --host 0.0.0.0
 

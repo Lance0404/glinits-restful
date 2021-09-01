@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask
 from sqlalchemy import create_engine
 from sqlalchemy_utils import database_exists, create_database
@@ -9,7 +11,7 @@ from buying_frenzy.model import *
 # models should be imported and run before any db related operation 
 # e.g. create_all(), drop_all()
 
-def create_app():
+def create_app(test_config=None):
     """
     database will be create if not exist
     """
@@ -20,6 +22,20 @@ def create_app():
     engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
     if not database_exists(engine.url):
         create_database(engine.url)
+
+    if test_config is None:
+        # load the instance config, if it exists, when not testing
+        # app.config.from_pyfile('config.py', silent=True)
+        pass
+    else:
+        # load the test config if passed in
+        app.config.from_mapping(test_config)
+
+    # ensure the instance folder exists
+    try:
+        os.makedirs(app.instance_path)
+    except OSError:
+        pass
 
     with app.app_context():
         db.init_app(app)

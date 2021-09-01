@@ -16,12 +16,8 @@ class RestaurantEntity():
     def __init__(self, item: dict) -> None:
         self.name = item['restaurantName']
         self.cash_balance = item['cashBalance']
-        # logger.debug(f'name {self.name}')
         self.__menu(item['menu'])
         self.__opening_hours(item['openingHours'])
-        # print(f'RestaurantEntity: {self}')
-        # print(f'opening_hours {len(self.opening_hours)}')
-        # breakpoint()
 
     def __menu(self, items: list):
         self.menu = [Dish(i['dishName'], i['price']) for i in items]
