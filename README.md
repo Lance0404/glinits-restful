@@ -17,5 +17,16 @@
 ### API documentations
 * Swagger UI: `http://127.0.0.1:5000/v1/doc/`
 
+### Test
+* Prerequisites: poetry
+
+* `poetry shell` or `poetry install`
+* `pytest` to test
+
+* Run with coverage report:
+    * `coverage run -m pytest`
+    * `coverage report`
+    * `coverage html` # open htmlcov/index.html in a browser
+
 ### Notes
 * [READM_dev.md](./doc/README_dev.md) is my personal notes while developing
