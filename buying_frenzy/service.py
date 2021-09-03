@@ -1,17 +1,14 @@
-from buying_frenzy.endpoints.v1 import restaurant
 from typing import Generator
 from flask import current_app
-from datetime import datetime, time
-from sqlalchemy import select, func
-from sqlalchemy.sql.expression import label
-from sqlalchemy.orm import joinedload, load_only
+from datetime import datetime
+from sqlalchemy import func
 
 from .entity import RestaurantEntity, CustomerEntity
 from .model import (
     Restaurant, RestaurantOpening, RestaurantMenu,
     Customer, CustomerHistory,
 )
-from .errors import CommitError, DishNotInRestaurant
+from .errors import CommitError, DishNotInRestaurant, UserNoMoney
 from . import db
 
 logger = current_app.logger
@@ -162,7 +159,6 @@ HAVING count(restaurant_menu.id) <= %(count_1)s ORDER BY count(restaurant_menu.i
     def search_by_type_and_term(cls, term: str) -> Generator:
         logger.info(f'start search_by_type_and_term({term})...')
         stmt = (db.session.query(Restaurant.name, Restaurant.id)
-            # .select_from(Restaurant)
             .filter(Restaurant.name.ilike(f'%{term}%'))
             .order_by(Restaurant.name)
         )
@@ -231,6 +227,8 @@ restaurant_id={restaurant_id}, dish_id={dish_id})...')
 
         customer = db.session.query(Customer).filter_by(id=user_id).one()
         logger.debug(f'BEFORE {customer.name} {customer.cash_balance}')
+        if customer.cash_balance - price < 0:
+            raise UserNoMoney
         customer.cash_balance -= price
         logger.debug(f'AFTER {customer.name} {customer.cash_balance}')
         

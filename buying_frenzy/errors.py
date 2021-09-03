@@ -30,3 +30,6 @@ class CommitError(Exception):
 
 class DishNotInRestaurant(Exception):
     pass
+
+class UserNoMoney(Exception):
+    pass
