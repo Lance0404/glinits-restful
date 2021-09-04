@@ -5,8 +5,6 @@ from dateutil.parser import parse
 import json
 import re
 
-logger = current_app.logger
-
 class RestaurantEntity():
     name = None
     cash_balance = float()
@@ -52,13 +50,13 @@ class RestaurantEntity():
         >>> parse('11:59:59.999999 pm').time() > parse('16:15:00').time()
         True
         """
-        # logger.debug('start __time_range()...')
+        # current_app.logger.debug('start __time_range()...')
         time_range_split: tuple = (time_range,)
         times = tuple(i.strip() for i in time_range.split('-', maxsplit=2))
         (start, end) = times
         if parse(start).time() > parse(end).time() and parse(end).time() != parse('12 am').time():
             time_range_split = (f'{start} - 11:59:59.999999 pm', f'12:00 am - {end}')
-            # logger.debug(f'[{self.name}] {time_range_split}')
+            # current_app.logger.debug(f'[{self.name}] {time_range_split}')
         return time_range_split
 
     def __weekday(self, item: str) -> tuple[int]:
@@ -85,7 +83,7 @@ class RestaurantEntity():
                 if i in item.lower():
                     return weekdays.index(i)
 
-            logger.error(f'item {item} no match to weekdays!')
+            current_app.logger.error(f'item {item} no match to weekdays!')
             raise Exception('no match to weekdays!')                    
 
         with_comma = ',' in item
@@ -101,7 +99,7 @@ class RestaurantEntity():
             # CAVEAT: handle Sun - Mon (6 - 0) or Sat - Mon (5 - 0) cases
             if end == 0:
                 day_indices = tuple([i for i in range(start, len(weekdays))] + [0])
-                # logger.debug(f'name {self.name}, day_indices {day_indices}')
+                # current_app.logger.debug(f'name {self.name}, day_indices {day_indices}')
             else:
                 day_indices = tuple(i for i in range(start, end + 1))
         else:
@@ -161,7 +159,7 @@ class Opening():
     end: time = None
 
     def __init__(self, weekday: int, time_range: str) -> None:
-        # logger.debug(f'{weekday} => {time_range}')
+        # current_app.logger.debug(f'{weekday} => {time_range}')
         self.weekday = weekday
         self.__str_to_time(time_range)
 

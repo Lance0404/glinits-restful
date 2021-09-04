@@ -1,9 +1,5 @@
-from flask import Blueprint, jsonify, current_app, request
-from flask_restx import Api, Resource, fields
-
-from buying_frenzy.errors import Common
-
-logger = current_app.logger
+from flask import Blueprint
+from flask_restx import Api, Resource
 
 # `url_prefix` of Blueprint leads to swagger url
 # http://127.0.0.1:5000/hello/
@@ -15,7 +11,7 @@ api = Api(bp, version="1.0", title="What the fuck API", description="A simple he
 # http://127.0.0.1:5000/hello/hello_ns
 ns = api.namespace("hello_ns", description="hello operations")
 
-# todo = api.model(
+# todo = api.models(
 #     "Todo", {"task": fields.String(required=True, description="The task details")}
 # )
 
@@ -34,13 +30,13 @@ class Hello(Resource):
 # can `api` and `bp` co-exist? No, they cannot.
 @bp.route('/hello', methods=['GET'])
 def hello():
-    logger.debug('hello world')
-    logger.debug(f'request {request}')
+    current_app.logger.debug('hello world')
+    current_app.logger.debug(f'request {request}')
     res = {'msg': 'ok', 'status': True}
     return jsonify(res)
 
 @bp.route('/hello_err', methods=['GET'])
 def hello_err():
-    logger.error('hello err')
+    current_app.logger.error('hello err')
     raise Common
 """    

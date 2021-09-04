@@ -1,5 +1,5 @@
 # file organization
-* `model.py` defines table schema
+* `models.py` defines table schema
 * `entity.py` denotes data objects 
 * dto denotes http request/response (not used yet)
 

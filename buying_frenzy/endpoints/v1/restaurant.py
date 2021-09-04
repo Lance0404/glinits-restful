@@ -4,8 +4,6 @@ from flask_restx import Api, Resource
 from buying_frenzy.errors import InvalidUrlPath
 from ...view import View
 
-logger = current_app.logger
-
 # FIXME: found at most 400 in database  
 MAX_DISH_PRICE=500
 
@@ -38,7 +36,7 @@ class ListOpeningRestaurant(Resource):
     @ns_rest.doc(parser=parser_1, description="list opened restaurant by datetime")
     def get(self):
         """list opened restaurant"""
-        logger.info('start list()...')
+        current_app.logger.info('start list()...')
         datetime = parser_1.parse_args(strict=True).get('datetime')
         open_restaurants = View.list_restaurant(datetime) if datetime else View.list_restaurant()
         return jsonify(counts=len(open_restaurants), open_restaurants=open_restaurants)
@@ -70,7 +68,7 @@ class SearchBy(Resource):
     @ns_rest.doc(params=dict(type_='[restaurant/dish]', term='to search for'), description="Search for restaurants or dishes by name, ranked by relevance to search term")
     def get(self, type_: str, term: str):
         """Search for restaurants or dishes by name, ranked by relevance"""
-        logger.info(f'start search_by(type={type_}, term={term})...')
+        current_app.logger.info(f'start search_by(type={type_}, term={term})...')
         if type_ not in ('restaurant', 'dish'):
             raise InvalidUrlPath(f'{request.url}')
         return jsonify([[i[0], i[1]] for i in View.search_by_type_and_term(type_, term)])
@@ -86,7 +84,7 @@ class Buy(Resource):
     @ns_user.doc(params=dict(user_id='start from 0', restaurant_id='start from 1', dish_id='start from 1'), description="Process a user purchasing a dish from a restaurant, handling all relevant data changes in an atomic transaction")
     def put(self, user_id: int, restaurant_id: int, dish_id: int):
         """User buy a dish from a restaurant"""
-        logger.info(f'start buy({user_id}, {restaurant_id}, {dish_id})')
+        current_app.logger.info(f'start buy({user_id}, {restaurant_id}, {dish_id})')
         View.buy(user_id, restaurant_id, dish_id)
         return jsonify('transaction successful')
 

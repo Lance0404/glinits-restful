@@ -4,14 +4,12 @@ from datetime import datetime
 from sqlalchemy import func
 
 from .entity import RestaurantEntity, CustomerEntity
-from .model import (
+from .models import (
     Restaurant, RestaurantOpening, RestaurantMenu,
     Customer, CustomerHistory,
 )
 from .errors import CommitError, DishNotInRestaurant, UserNoMoney
 from . import db
-
-logger = current_app.logger
 
 def commit():
     """
@@ -20,7 +18,7 @@ def commit():
     try:
         db.session.commit()
     except Exception as e:
-        logger.error(e)
+        current_app.logger.error(e)
         db.session.rollback()
         raise CommitError
 
@@ -41,17 +39,17 @@ class RestaurantService():
         # `flush()` is necessary for returning the id created on the database to the `Restaurant` instance
 
         # TODO: using list comprehension, cause I failed with generator comprehension
-        # logger.debug(f'preparing to insert {RestaurantMenu.__tablename__}')
+        # current_app.logger.debug(f'preparing to insert {RestaurantMenu.__tablename__}')
         [db.session.add(RestaurantMenu(resta.id, i.name, i.price)) for i in data.menu]
-        # logger.debug(f'preparing to insert {RestaurantOpening.__tablename__}')
+        # current_app.logger.debug(f'preparing to insert {RestaurantOpening.__tablename__}')
         [db.session.add(RestaurantOpening(resta.id, opening.weekday, opening.start, opening.end)) for opening in data.opening_hours]
         commit()
 
     @classmethod
     def list_available_restaurant_by(cls, dt: datetime) -> Generator:
         # FIXME: should intake datetime which carries day of week information
-        logger.debug(f'start list_available_restaurant_by({dt})')
-        logger.debug(f'weekday {dt.weekday()}, time {dt.time()}')
+        current_app.logger.debug(f'start list_available_restaurant_by({dt})')
+        current_app.logger.debug(f'weekday {dt.weekday()}, time {dt.time()}')
 
         # method 1: [ref](https://stackoverflow.com/a/39553869)
         stmt = (db.session.query(Restaurant.name)
@@ -61,7 +59,7 @@ class RestaurantService():
             .filter(RestaurantOpening.start <= dt.time())
             .filter(RestaurantOpening.end >= dt.time())            
         )
-        logger.debug(stmt)
+        current_app.logger.debug(stmt)
         """
         SELECT restaurant.name AS restaurant_name 
         FROM restaurant_opening JOIN restaurant ON restaurant.id = restaurant_opening.restaurant_id 
@@ -106,7 +104,7 @@ class RestaurantService():
             .where(RestaurantOpening.weekday == dt.weekday())
             .where(RestaurantOpening.start < dt.time())
             .where(RestaurantOpening.end > dt.time()))
-        logger.debug(f'stmt: {stmt}')
+        current_app.logger.debug(f'stmt: {stmt}')
         result = db.session.execute(stmt).fetchall()
         """
 
@@ -132,7 +130,7 @@ ORDER BY counts DESC, b.name ASC
         [ref](https://stackoverflow.com/a/4086229)
         session.query(Table.column, func.count(Table.column)).group_by(Table.column).all()
         """
-        logger.info('start list_by_dish_count_and_price_range()...')
+        current_app.logger.info('start list_by_dish_count_and_price_range()...')
         count_ = func.count(RestaurantMenu.id)
         stmt = (db.session.query(Restaurant.name, count_)
             .select_from(RestaurantMenu)
@@ -145,7 +143,7 @@ ORDER BY counts DESC, b.name ASC
         stmt = (stmt.having(count_ >= dish_count) if action == 'more' 
             else stmt.having(count_ <= dish_count))
         stmt = stmt.order_by(count_.desc()).limit(restaurant_count)
-        # logger.debug(stmt)
+        # current_app.logger.debug(stmt)
         """
 SELECT restaurant.name AS restaurant_name, count(restaurant_menu.id) AS count 
 FROM restaurant_menu JOIN restaurant ON restaurant.id = restaurant_menu.restaurant_id 
@@ -157,12 +155,12 @@ HAVING count(restaurant_menu.id) <= %(count_1)s ORDER BY count(restaurant_menu.i
         
     @classmethod
     def search_by_type_and_term(cls, term: str) -> Generator:
-        logger.info(f'start search_by_type_and_term({term})...')
+        current_app.logger.info(f'start search_by_type_and_term({term})...')
         stmt = (db.session.query(Restaurant.name, Restaurant.id)
             .filter(Restaurant.name.ilike(f'%{term}%'))
             .order_by(Restaurant.name)
         )
-        logger.debug(stmt)
+        current_app.logger.debug(stmt)
         """
 SELECT restaurant.name AS restaurant_name 
 FROM restaurant, restaurant_menu 
@@ -179,7 +177,7 @@ class CustomerService():
 
     @classmethod
     def create(cls, customer_entity: CustomerEntity):
-        logger.debug(f'start {cls.__name__}.create()...')
+        # current_app.logger.debug(f'start {cls.__name__}.create()...')
         customer = Customer(customer_entity.id, customer_entity.name, customer_entity.cash_balance)
         db.session.add(customer)
         # FIXME: legacy code
@@ -189,12 +187,12 @@ class CustomerService():
 
     @classmethod
     def search_by_type_and_term(cls, term: str):
-        logger.info(f'start {cls.__name__}.search_by_type_and_term({term})...')
+        current_app.logger.info(f'start {cls.__name__}.search_by_type_and_term({term})...')
         stmt = (db.session.query(RestaurantMenu.dish_name, RestaurantMenu.id)
             .filter(RestaurantMenu.dish_name.ilike(f'%{term}%'))
             .order_by(RestaurantMenu.dish_name)
         )
-        logger.debug(stmt)
+        current_app.logger.debug(stmt)
         """
 SELECT customer.name AS customer_name 
 FROM customer 
@@ -211,42 +209,42 @@ WHERE customer.name LIKE %(name_1)s ORDER BY customer.name
         2. deduct customer's cashBalance
         3. add to restaurant's cashBalance
         """
-        logger.info(f'start {cls.__name__}.buy(user_id={user_id}, \
+        current_app.logger.info(f'start {cls.__name__}.buy(user_id={user_id}, \
 restaurant_id={restaurant_id}, dish_id={dish_id})...')
         
         stmt = (db.session.query(RestaurantMenu.price, RestaurantMenu.restaurant_id)
             .filter(RestaurantMenu.id == dish_id)
         )
-        logger.debug(stmt)
+        current_app.logger.debug(stmt)
         dish = stmt.one()
         price = dish[0]
         dish_restaurant_id = dish[1]
         if dish_restaurant_id != restaurant_id:
             raise DishNotInRestaurant
-        logger.debug(f'price {price}')
+        current_app.logger.debug(f'price {price}')
 
         customer = db.session.query(Customer).filter_by(id=user_id).one()
-        logger.debug(f'BEFORE {customer.name} {customer.cash_balance}')
+        current_app.logger.debug(f'BEFORE {customer.name} {customer.cash_balance}')
         if customer.cash_balance - price < 0:
             raise UserNoMoney
         customer.cash_balance -= price
-        logger.debug(f'AFTER {customer.name} {customer.cash_balance}')
+        current_app.logger.debug(f'AFTER {customer.name} {customer.cash_balance}')
         
         # emit_error()
-        # logger.debug(f'(1)AFTER error {customer.name} {customer.cash_balance}')
+        # current_app.logger.debug(f'(1)AFTER error {customer.name} {customer.cash_balance}')
 
         restaurant = db.session.query(Restaurant).filter_by(id=restaurant_id).one()
-        logger.debug(f'BEFORE {restaurant.name} {restaurant.cash_balance}')
+        current_app.logger.debug(f'BEFORE {restaurant.name} {restaurant.cash_balance}')
         restaurant.cash_balance += price
-        logger.debug(f'AFTER {restaurant.name} {restaurant.cash_balance}')
+        current_app.logger.debug(f'AFTER {restaurant.name} {restaurant.cash_balance}')
 
         # emit_error()
-        # logger.debug(f'(2)AFTER error {customer.name} {customer.cash_balance}')
-        # logger.debug(f'(2)AFTER error {restaurant.name} {restaurant.cash_balance}')
+        # current_app.logger.debug(f'(2)AFTER error {customer.name} {customer.cash_balance}')
+        # current_app.logger.debug(f'(2)AFTER error {restaurant.name} {restaurant.cash_balance}')
 
         commit()
-        logger.debug(f'(2)AFTER commit {customer.name} {customer.cash_balance}')
-        logger.debug(f'(2)AFTER commit {restaurant.name} {restaurant.cash_balance}')
+        current_app.logger.debug(f'(2)AFTER commit {customer.name} {customer.cash_balance}')
+        current_app.logger.debug(f'(2)AFTER commit {restaurant.name} {restaurant.cash_balance}')
 
 def emit_error():
     """
@@ -257,6 +255,6 @@ def emit_error():
     try:
         raise CommitError
     except CommitError:
-        logger.error('error happens!')
+        current_app.logger.error('error happens!')
         db.session.rollback()
         db.session.flush()
