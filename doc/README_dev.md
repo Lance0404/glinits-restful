@@ -133,6 +133,8 @@ docker-compose up -d
     * `flask postman`
     * `postman-collection-transformer convert -i data/glinits.json -o data/glinits_v2.json -j 1.0.0 -p 2.0.0 -P`
     * `cp data/glinits_v2.json /mnt/c/Users/lance/Downloads`
+1. [sqlalchemy race condition](https://dev.to/ivankwongtszfung/safe-update-operation-in-postgresql-using-sqlalchemy-3ela)
+1. [Flask deployment](https://flask.palletsprojects.com/en/2.0.x/deploying)
 
 ## Wish list
 1. come up with a FAST API solution    

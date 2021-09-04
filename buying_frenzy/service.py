@@ -216,6 +216,8 @@ restaurant_id={restaurant_id}, dish_id={dish_id})...')
             .filter(RestaurantMenu.id == dish_id)
         )
         current_app.logger.debug(stmt)
+        
+
         dish = stmt.one()
         price = dish[0]
         dish_restaurant_id = dish[1]
@@ -223,7 +225,18 @@ restaurant_id={restaurant_id}, dish_id={dish_id})...')
             raise DishNotInRestaurant
         current_app.logger.debug(f'price {price}')
 
-        customer = db.session.query(Customer).filter_by(id=user_id).one()
+        stmt = db.session.query(Customer).filter_by(id=user_id).with_for_update()
+        current_app.logger.debug(stmt)
+
+        """
+        CAVEAT: to solve race condition
+        
+SELECT customer.id AS customer_id, customer.name AS customer_name, customer.cash_balance AS customer_cash_balance 
+FROM customer 
+WHERE customer.id = %(id_1)s FOR UPDATE
+        """
+
+        customer = stmt.one()
         current_app.logger.debug(f'BEFORE {customer.name} {customer.cash_balance}')
         if customer.cash_balance - price < 0:
             raise UserNoMoney
