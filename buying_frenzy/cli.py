@@ -1,11 +1,15 @@
 import click
 import json
 from flask import current_app, Blueprint
+from flask.cli import with_appcontext
+from sqlalchemy.exc import OperationalError
+from sqlite3 import IntegrityError
 
 from . import db
 from .view import json_to_generator, integrate_restaurant_and_user_data, process_restaurant_data, process_user_data
 
 from buying_frenzy.endpoints.v1.restaurant import api
+from .errors import CommitError
 
 bp = Blueprint('cli', __name__, cli_group=None)
 
@@ -31,7 +35,9 @@ def create_all():
     current_app.logger.info('all tables created')
 
 @bp.cli.command("pre-etl")
-def pre_etl():
+@with_appcontext
+@click.option('--dir', default='data')
+def pre_etl(dir: str):
     """Preprocess raw data before loading them into database
 
     checked which has more items:
@@ -41,11 +47,10 @@ def pre_etl():
     cat data/users_with_purchase_history.json | grep -c 'purchaseHistory'
     1000
 
-    Restaurant items is more than User data, but we still need to use loop through restaurant data
+    Restaurant items is more than User data, but we still need to use user data to loop through restaurant data
     """
-
-    resta_generator = json_to_generator('data/restaurant_with_menu.json')
-    user_generator = json_to_generator('data/users_with_purchase_history.json')
+    resta_generator = json_to_generator(f'{dir}/restaurant_with_menu.json')
+    user_generator = json_to_generator(f'{dir}/users_with_purchase_history.json')
     (new_resta_generator, new_user_generator) = integrate_restaurant_and_user_data(resta_generator, user_generator)
     process_restaurant_data(new_resta_generator)
     process_user_data(new_user_generator)

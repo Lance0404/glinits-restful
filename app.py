@@ -1,14 +1,13 @@
-from werkzeug.middleware.proxy_fix import ProxyFix
-from buying_frenzy import create_app
-from buying_frenzy.cli import bp as cli_bp
-from buying_frenzy.endpoints.v1.hello import bp as hello_bp
-from buying_frenzy.endpoints.v1.restaurant import bp as restaurant_bp
+import sys
+from sqlalchemy.exc import OperationalError
 
-app = create_app()
-app.wsgi_app = ProxyFix(app.wsgi_app)
-app.register_blueprint(cli_bp)
-app.register_blueprint(hello_bp)
-app.register_blueprint(restaurant_bp)
+from buying_frenzy import create_app
+
+try:
+    app = create_app()
+except OperationalError as e:
+    print('[ERROR] make sure your database is ready to serve', file=sys.stderr)
+    exit(1)
 
 if __name__ == '__main__':
     app.run()

@@ -1,0 +1,120 @@
+[
+    {
+        "cashBalance": 4483.84,
+        "menu": [
+            {
+                "dishName": "Postum cereal coffee",
+                "price": 13.88
+            },
+            {
+                "dishName": "GAI TOM KA: CHICKEN IN COCONUT CREAM SOUP WITH LIME JUICE GALANGA AND CHILI",
+                "price": 10.64
+            },
+            {
+                "dishName": "Coffee Cocktail (Port Wine",
+                "price": 12.45
+            },
+            {
+                "dishName": "La Romaine Braisée au Fond de Veau",
+                "price": 10.59
+            },
+            {
+                "dishName": "DRY LIGHT IMPORTED WINE",
+                "price": 13.5
+            },
+            {
+                "dishName": "Broiled Pompano",
+                "price": 13.5
+            },
+            {
+                "dishName": "Dean Yale School of Medicine",
+                "price": 12.56
+            },
+            {
+                "dishName": "Place here Stamp",
+                "price": 12.38
+            },
+            {
+                "dishName": "1908 Berncasteler",
+                "price": 11.64
+            },
+            {
+                "dishName": "Hummersuppe Filetsteak Nelson",
+                "price": 10.51
+            },
+            {
+                "dishName": "Hominy",
+                "price": 10.2
+            },
+            {
+                "dishName": "Baltimore terrapin",
+                "price": 14.0
+            },
+            {
+                "dishName": "Lettuce and Tomato Salads",
+                "price": 11.79
+            },
+            {
+                "dishName": "Sweet Virginia Pickles",
+                "price": 10.15
+            }
+        ],
+        "openingHours": "Mon, Fri 2:30 pm - 8 pm / Tues 11 am - 2 pm / Weds 1:15 pm - 3:15 am / Thurs 10 am - 3:15 am / Sat 5 am - 11:30 am / Sun 10:45 am - 5 pm",
+        "restaurantName": "'Ulu Ocean Grill and Sushi Lounge"
+    },
+    {
+        "cashBalance": 4882.81,
+        "menu": [
+            {
+                "dishName": "Sweetbreads",
+                "price": 13.57
+            },
+            {
+                "dishName": "Old pepper bourbon",
+                "price": 10.15
+            },
+            {
+                "dishName": "Whiskey Cocktails",
+                "price": 10.25
+            },
+            {
+                "dishName": "Filets de poularde",
+                "price": 11.15
+            },
+            {
+                "dishName": "Baked Weakfish with Boiled Potatoes",
+                "price": 10.25
+            },
+            {
+                "dishName": "Ox=tail Ragout with Vegetables",
+                "price": 10.35
+            },
+            {
+                "dishName": "1952er Gau Algesheimer Stolzenberg natur",
+                "price": 12.34
+            },
+            {
+                "dishName": "Caneton à l'Orange",
+                "price": 11.09
+            },
+            {
+                "dishName": "*COLD-Mayonnaise of Fish Printaniere",
+                "price": 12.0
+            },
+            {
+                "dishName": "Rum & Raisin Ice Cream",
+                "price": 13.86
+            },
+            {
+                "dishName": "Fried",
+                "price": 10.25
+            },
+            {
+                "dishName": "German potato salad",
+                "price": 10.1
+            }
+        ],
+        "openingHours": "Mon, Weds 11:45 am - 4:45 pm / Tues 7:45 am - 2 am / Thurs 5:45 pm - 12 am / Fri, Sun 6 am - 9 pm / Sat 10:15 am - 9 pm",
+        "restaurantName": "024 Grille"
+    }
+]    

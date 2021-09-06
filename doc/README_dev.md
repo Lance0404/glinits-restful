@@ -140,6 +140,8 @@ WSGI app 0 (mountpoint='') ready in 0 seconds on interpreter 0x56152622ad50 pid:
 spawned uWSGI worker 1 (and the only) (pid: 8828, cores: 1)
 ```
 
+### Test
+* pytest -v --log-level=DEBUG tests/functional/test_buying_frenzy.py
     
 ### Reference
 1. [Dockerfile example](https://www.mktr.ai/the-data-scientists-quick-guide-to-dockerfiles-with-examples/)
@@ -154,6 +156,9 @@ spawned uWSGI worker 1 (and the only) (pid: 8828, cores: 1)
 1. [basic relationship pattern](https://docs.sqlalchemy.org/en/14/orm/basic_relationships.html)
 1. [breakpoint()](https://www.journaldev.com/22695/python-breakpoint)
 1. [how to modify a specific commit](https://stackoverflow.com/a/1186549)
+1. [customized docker container for uwsgi-nginx-flask](https://github.com/tiangolo/uwsgi-nginx-flask-docker)
+1. [flask pytest](https://testdriven.io/blog/flask-pytest/)
+1. [WSGI vs ASGI](https://medium.com/analytics-vidhya/difference-between-wsgi-and-asgi-807158ed1d4c)
 
 ### Issues with solutions
 1. [sqlalchemy create all does not create tables](https://stackoverflow.com/a/20749534)
@@ -170,9 +175,10 @@ spawned uWSGI worker 1 (and the only) (pid: 8828, cores: 1)
 1. [sqlalchemy race condition](https://dev.to/ivankwongtszfung/safe-update-operation-in-postgresql-using-sqlalchemy-3ela)
 1. [Flask deployment](https://flask.palletsprojects.com/en/2.0.x/deploying)
 1. [poetry add uwsgi failed, solved with](https://stackoverflow.com/a/61725752)
+    * `sudo apt-get update`
     * `sudo apt install libpython3.9-dev`
     * `sudo pip install uwsgi`
 
 
 ## Wish list
-1. come up with a FAST API solution    
+1. come up with a FAST API solution
