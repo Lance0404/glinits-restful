@@ -9,13 +9,13 @@
 * `docker-compose up -d` to init the services accordingly
 * (Optional) for clean up & restart
     * `docker exec -it glinits_app flask drop-all` to clean up old data if any
-    * `docker-compose down; docker-compose up -d` is necessary for flask app to recreate the tables
+    * `docker-compose restart app` is necessary for flask app to recreate the tables
 * (Monitoring)    
     * `docker-compose logs -f --tail=10` to check the services are healthy    
 * `docker exec -it glinits_app flask pre-etl` to ETL (~ 30 s on my PC)
 
 ### API documentations
-* Swagger UI: `http://127.0.0.1:5000/v1/doc/`
+* Swagger UI: `http://localhost/v1/doc/`
 
 ### Test
 * Prerequisites: poetry

@@ -1,16 +1,15 @@
 version: '3.8'
 services:
-    # nginx:
-    #     container_name: glinits_nginx
-    #     image: nginx:1.21
-    #     ports:
-    #         - "80:80"
-    #     volumes:
-    #         - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-    #         - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
-    #     networks:
-    #         - network
-    #     restart: always
+    nginx:
+        container_name: glinits_nginx
+        image: nginx:1.21
+        ports:
+            - "80:80"
+        volumes:
+            - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+        networks:
+            - backend
+        restart: always
     psql:
         container_name: glinits_psql
         image: postgres:13
@@ -36,14 +35,17 @@ services:
         image: glinits_app
         env_file:
             - .flaskenv
-        # command: uwsgi --ini uwsgi.ini
-        command: flask run --host 0.0.0.0
+        volumes:
+            - ./uwsgi.ini:/uwsgi.ini           
+        command: uwsgi --ini uwsgi.ini
+        # command: flask run --host 0.0.0.0
 
         # https://stackoverflow.com/a/45450456
         # Handy for debug!
         # command: tail -F anything
         depends_on:
             - psql
+            - nginx
         ports:
             - "5000:5000"
         restart: always
