@@ -33,3 +33,6 @@ class DishNotInRestaurant(Exception):
 
 class UserNoMoney(Exception):
     pass
+
+class UserNotFound(Exception):
+    pass

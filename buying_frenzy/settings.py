@@ -25,6 +25,7 @@ class Config(object):
 # (Pdb) app.config.get('SQLALCHEMY_ENGINE_OPTIONS')
 # {'pool_size': 10, 'pool_recycle': 120, 'pool_pre_ping': True}
 
-    # for postman
-    SERVER_NAME = str(os.environ.get('SERVER_NAME', '127.0.0.1:5000'))
+    # FIXME: only required for for postman, further testing required
+    # beware that this setting will fix the server name
+    # SERVER_NAME = str(os.environ.get('SERVER_NAME', '127.0.0.1:5000'))
     

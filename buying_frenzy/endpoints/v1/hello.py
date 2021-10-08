@@ -16,7 +16,7 @@ ns = api.namespace("hello_ns", description="hello operations")
 # )
 
 @ns.route("/<string:name>")
-@ns.doc(responses={404: "What the fuck is going on"}, params={"name": "Who you greet to"})
+@ns.doc(responses={404: "Not Found"}, params={"name": "Who you greet to"})
 class Hello(Resource):
 
     @ns.doc(description=f"say hello to someone")

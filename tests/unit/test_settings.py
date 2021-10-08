@@ -1,4 +1,4 @@
-from buying_frenzy.default_settings import Config
+from buying_frenzy.settings import Config
 
 def test_config():
     c = Config()
@@ -12,4 +12,3 @@ def test_config():
         pool_recycle=120,
         pool_pre_ping=True
     )
-    assert getattr(c, 'SERVER_NAME') == '127.0.0.1:5000' 

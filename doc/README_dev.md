@@ -107,6 +107,42 @@ docker-compose up -d
 # confirmed that db was gone
 ```
 
+* launch flask app with uwsgi: `uwsgi --socket 0.0.0.0:5000 --protocol=http -w wsgi:app`
+```sh
+(glints-restful-pGw0PNjN-py3.9) ➜  glints-restful git:(develop) ✗ uwsgi --socket 0.0.0.0:5000 --protocol=http -w wsgi:app
+
+*** Starting uWSGI 2.0.19.1 (64bit) on [Mon Sep  6 09:33:13 2021] ***
+compiled with version: 9.3.0 on 06 September 2021 01:27:47
+os: Linux-5.4.72-microsoft-standard-WSL2 #1 SMP Wed Oct 28 23:40:43 UTC 2020
+nodename: DESKTOP-57E5VOD
+machine: x86_64
+clock source: unix
+detected number of CPU cores: 16
+current working directory: /home/lance/Projects/glints-restful
+detected binary path: /home/lance/.cache/pypoetry/virtualenvs/glints-restful-pGw0PNjN-py3.9/bin/uwsgi
+!!! no internal routing support, rebuild with pcre support !!!
+*** WARNING: you are running uWSGI without its master process manager ***
+your processes number limit is 50843
+your memory page size is 4096 bytes
+detected max file descriptor number: 4096
+lock engine: pthread robust mutexes
+thunder lock: disabled (you can enable it with --thunder-lock)
+uwsgi socket 0 bound to TCP address 0.0.0.0:5000 fd 3
+Python version: 3.9.6 (default, Jul  3 2021, 16:40:50)  [GCC 9.3.0]
+*** Python threads support is disabled. You can enable it with --enable-threads ***
+Python main interpreter initialized at 0x56152622ad50
+your server socket listen backlog is limited to 100 connections
+your mercy for graceful operations on workers is 60 seconds
+mapped 72920 bytes (71 KB) for 1 cores
+*** Operational MODE: single process ***
+WSGI app 0 (mountpoint='') ready in 0 seconds on interpreter 0x56152622ad50 pid: 8828 (default app)
+*** uWSGI is running in multiple interpreter mode ***
+spawned uWSGI worker 1 (and the only) (pid: 8828, cores: 1)
+```
+
+### Test
+* pytest -v --log-level=DEBUG tests/functional/test_buying_frenzy.py
+    
 ### Reference
 1. [Dockerfile example](https://www.mktr.ai/the-data-scientists-quick-guide-to-dockerfiles-with-examples/)
 1. [Flask custom commands](https://flask.palletsprojects.com/en/2.0.x/cli/#custom-commands)
@@ -120,6 +156,9 @@ docker-compose up -d
 1. [basic relationship pattern](https://docs.sqlalchemy.org/en/14/orm/basic_relationships.html)
 1. [breakpoint()](https://www.journaldev.com/22695/python-breakpoint)
 1. [how to modify a specific commit](https://stackoverflow.com/a/1186549)
+1. [customized docker container for uwsgi-nginx-flask](https://github.com/tiangolo/uwsgi-nginx-flask-docker)
+1. [flask pytest](https://testdriven.io/blog/flask-pytest/)
+1. [WSGI vs ASGI](https://medium.com/analytics-vidhya/difference-between-wsgi-and-asgi-807158ed1d4c)
 
 ### Issues with solutions
 1. [sqlalchemy create all does not create tables](https://stackoverflow.com/a/20749534)
@@ -135,6 +174,11 @@ docker-compose up -d
     * `cp data/glinits_v2.json /mnt/c/Users/lance/Downloads`
 1. [sqlalchemy race condition](https://dev.to/ivankwongtszfung/safe-update-operation-in-postgresql-using-sqlalchemy-3ela)
 1. [Flask deployment](https://flask.palletsprojects.com/en/2.0.x/deploying)
+1. [poetry add uwsgi failed, solved with](https://stackoverflow.com/a/61725752)
+    * `sudo apt-get update`
+    * `sudo apt install libpython3.9-dev`
+    * `sudo pip install uwsgi`
+
 
 ## Wish list
-1. come up with a FAST API solution    
+1. come up with a FAST API solution

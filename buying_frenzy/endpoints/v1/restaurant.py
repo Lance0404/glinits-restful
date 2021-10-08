@@ -30,10 +30,11 @@ parser_2.add_argument('min', type=float, default=0, location='args', help='price
 parser_2.add_argument('max', type=float, default=500, location='args', help='price range upper bound')
 
 @ns_rest.route("/list")
-@ns_rest.doc(responses={404: "What the fuck is going on"})
+@ns_rest.doc(responses={404: "Not Found"})
 class ListOpeningRestaurant(Resource):
 
-    @ns_rest.doc(parser=parser_1, description="list opened restaurant by datetime")
+    @ns_rest.doc(description="list opened restaurant by datetime")
+    @ns_rest.expect(parser_1)
     def get(self):
         """list opened restaurant"""
         current_app.logger.info('start list()...')
@@ -41,12 +42,14 @@ class ListOpeningRestaurant(Resource):
         open_restaurants = View.list_restaurant(datetime) if datetime else View.list_restaurant()
         return jsonify(counts=len(open_restaurants), open_restaurants=open_restaurants)
         
-# FIXME: defaults set on path variable not shown on swagger
-@ns_rest.route("/list/<int:restaurant_count>/dish/<string:action>/<int:dish_count>/price", defaults={'restaurant_count': 5, 'action': 'less', 'dish_count': 10})
-@ns_rest.doc(responses={404: "What the fuck is going on"})
+# FIXME: defaults set on path variable not shown on swagger, but it does override the value passed from pytest
+# @ns_rest.route("/list/<int:restaurant_count>/dish/<string:action>/<int:dish_count>/price", defaults={'restaurant_count': 5, 'action': 'less', 'dish_count': 10})
+@ns_rest.route("/list/<int:restaurant_count>/dish/<string:action>/<int:dish_count>/price")
+@ns_rest.doc(responses={404: "Not Found"})
 class ListTopRestaurantByDishAndPrice(Resource):
     
-    @ns_rest.doc(params=dict(restaurant_count='top y restaurants', action='[more/less]', dish_count='x number of dishes'), parser=parser_2, description="List top y restaurants that have more or less than x number of dishes within a price range")
+    @ns_rest.doc(params=dict(restaurant_count='top y restaurants', action='[more/less]', dish_count='x number of dishes'), description="List top y restaurants that have more or less than x number of dishes within a price range")
+    @ns_rest.expect(parser_2)
     def get(self, restaurant_count: int, action: str, dish_count: int):
         """List top y restaurants by dish count within a price range"""
         args = parser_2.parse_args(strict=True)
@@ -59,7 +62,7 @@ class ListTopRestaurantByDishAndPrice(Resource):
         return jsonify([i for i in data])
 
 @ns_rest.route("/search/<string:type_>/<string:term>")
-@ns_rest.doc(responses={404: "What the fuck is going on"})
+# @ns_rest.doc(responses={404: "Not Found"})
 class SearchBy(Resource):
     """
     Did not implement fancy recommendation algorithm under the hood
@@ -74,7 +77,7 @@ class SearchBy(Resource):
         return jsonify([[i[0], i[1]] for i in View.search_by_type_and_term(type_, term)])
 
 @ns_user.route("/<int:user_id>/buy/<int:restaurant_id>/<int:dish_id>")
-@ns_user.doc(responses={404: "What the fuck is going on"})
+@ns_user.doc(responses={404: "Not Found"})
 class Buy(Resource):
     """
     Always one at a time!

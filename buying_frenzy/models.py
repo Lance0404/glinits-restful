@@ -1,10 +1,10 @@
+from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column
 from sqlalchemy import Integer, DateTime, String, Float, Time
 from sqlalchemy.sql.schema import ForeignKey
 from sqlalchemy.orm import relationship
 
-from . import db
-# import the SQLAlchemy instance so the models can inherit from it
+db = SQLAlchemy()
 
 class Restaurant(db.Model):
     __tablename__ = 'restaurant'
@@ -57,6 +57,9 @@ class RestaurantMenu(db.Model):
         self.restaurant_id = restaurant_id
         self.dish_name = dish_name
         self.price = price
+
+    def __repr__(self):
+        return f'<RestaurantMenu id({self.id}), restaurant_id({self.restaurant_id}) dish_name({self.dish_name}) price({self.price})>'
 
 class Customer(db.Model):
     """Currently don't have relationship with Restaurant-tables

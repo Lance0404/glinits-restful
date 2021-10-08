@@ -1,10 +1,11 @@
 # TODO: this file is having duplicated functionality as `buying_frenzy/endpoints/__init__.py`
 # TODO: try to handle all errors in `buying_frenzy/errors.py`
 from flask import jsonify
+from sqlalchemy.exc import NoResultFound
 
 from .hello import bp as bp_hello
 from .restaurant import bp as bp_restaurant
-from buying_frenzy.errors import Common, DishNotInRestaurant, UserNoMoney
+from buying_frenzy.errors import Common, DishNotInRestaurant, UserNoMoney, UserNotFound
 
 @bp_hello.errorhandler(404)
 def error_404(e):
@@ -30,4 +31,8 @@ def dish_not_in_restaurant(error):
 
 @bp_restaurant.errorhandler(Common)
 def handle_common(error):
-    return 'Test Error', 400    
+    return 'Test Error', 400
+
+@bp_restaurant.errorhandler(UserNotFound)
+def handle_common(error):
+    return 'User not found', 404

@@ -8,7 +8,7 @@ from .models import (
     Restaurant, RestaurantOpening, RestaurantMenu,
     Customer, CustomerHistory,
 )
-from .errors import CommitError, DishNotInRestaurant, UserNoMoney
+from .errors import CommitError, DishNotInRestaurant, UserNoMoney, UserNotFound
 from . import db
 
 def commit():
@@ -169,6 +169,30 @@ WHERE restaurant_menu.price LIKE %(price_1)s
         result = stmt.all()
         return (i for i in result)
 
+    @classmethod
+    def get_restaurant_by_id(cls, id: int):
+        stmt = (db.session.query(Restaurant)
+            .filter(Restaurant.id == id)
+        )
+        result = stmt.one_or_none()
+        return result
+
+    @classmethod
+    def get_menu_by_restaurant_id(cls, id: int):
+        stmt = (db.session.query(RestaurantMenu)
+            .filter(RestaurantMenu.restaurant_id == id)
+        )
+        result = stmt.all()
+        return result
+
+    @classmethod
+    def get_dish_by_restaurant_id_and_dish_id(cls, restaurant_id: int, dish_id: int):
+        stmt = (db.session.query(RestaurantMenu)
+            .filter(RestaurantMenu.id == dish_id)
+            .filter(RestaurantMenu.restaurant_id == restaurant_id)
+        )
+        result = stmt.one_or_none()
+        return result
 
 class CustomerService():
 
@@ -200,6 +224,15 @@ WHERE customer.name LIKE %(name_1)s ORDER BY customer.name
         """
         result = stmt.all()
         return (i for i in result)
+
+    @classmethod
+    def get_user_by_id(cls, id: int):
+        stmt = (db.session.query(Customer)
+            .filter(Customer.id == id)
+        )
+        result = stmt.one_or_none()
+        return result
+
 
     @classmethod
     def buy(cls, user_id: int, restaurant_id: int, dish_id: int):
@@ -236,7 +269,9 @@ FROM customer
 WHERE customer.id = %(id_1)s FOR UPDATE
         """
 
-        customer = stmt.one()
+        customer = stmt.one_or_none()
+        if not customer:
+            raise UserNotFound
         current_app.logger.debug(f'BEFORE {customer.name} {customer.cash_balance}')
         if customer.cash_balance - price < 0:
             raise UserNoMoney

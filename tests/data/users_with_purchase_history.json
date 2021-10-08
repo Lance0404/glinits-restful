@@ -1,0 +1,28 @@
+[
+    {
+        "cashBalance": 947.42,
+        "id": 150,
+        "name": "Tomas Brown",
+        "purchaseHistory": [
+            {
+                "dishName": "DRY LIGHT IMPORTED WINE",
+                "restaurantName": "'Ulu Ocean Grill and Sushi Lounge",
+                "transactionAmount": 13.5,
+                "transactionDate": "04/07/2019 11:47 AM"
+            }
+        ]
+    },
+    {
+        "cashBalance": 311.58,
+        "id": 616,
+        "name": "Ruth Narain",
+        "purchaseHistory": [
+            {
+                "dishName": "*COLD-Mayonnaise of Fish Printaniere",
+                "restaurantName": "024 Grille",
+                "transactionAmount": 12.0,
+                "transactionDate": "05/17/2018 03:21 AM"
+            }
+        ]
+    }
+]
